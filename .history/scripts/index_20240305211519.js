@@ -4,8 +4,9 @@ function addCard(card, onRemoveCard) {
   const cardItem = cardTemplate.querySelector('.places__item').cloneNode(true);
   deleteButton = cardItem.querySelector('.card__delete-button');
   deleteButton.addEventListener('click', onRemoveCard);
-  cardItem.querySelector('.card__image').src = card.link;
+cardItem.querySelector('.card__image').src = card.link;
   cardItem.querySelector('.card__title').textContent = card.name;
+
   placesList.append(cardItem);
 }
 
