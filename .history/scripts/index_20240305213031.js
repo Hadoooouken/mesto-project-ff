@@ -6,7 +6,6 @@ function addCard(card, onRemoveCard) {
   deleteButton.addEventListener('click', onRemoveCard);
   cardItem.querySelector('.card__image').src = card.link;
   cardItem.querySelector('.card__title').textContent = card.name;
-  cardItem.querySelector('.card__image').alt = card.name;
   placesList.append(cardItem);
 }
 
