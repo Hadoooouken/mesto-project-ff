@@ -1,22 +1,62 @@
 import { initialCards } from '../scripts/cards.js';
-import '../src/index.css'; // добавьте импорт главного файла стилей
+import '../src/index.css'; 
 const placesList = document.querySelector('.places__list');
-const editPopupButton = document.querySelector('.profile__edit-button');
 const addButton = document.querySelector('.profile__add-button');
-const popup = document.querySelectorAll('.popup')
+const editButton = document.querySelector('.profile__edit-button');
+const editModal = document.querySelector('.popup_type_edit');
+const addModal = document.querySelector('.popup_type_new-card');
+const modalCloseButton = document.querySelectorAll('.popup__close');
 
-function openPopup(popupElement) {
-  popupElement.classList.add('.popup_is-opened');
+
+modalCloseButton.forEach(function (button) {
+  button.addEventListener('click', function () {
+    button.closest('.popup').classList.remove('popup_is-opened');
+  });
+});
+
+function openModal(modal) {
+  modal.classList.add('popup_is-opened');
+  document.addEventListener('keydown', closeModalByEsc);
 }
 
-editPopupButton.addEventListener('click', function () {
-  openPopup(popup);
-});
-
 addButton.addEventListener('click', function () {
-  openPopup(popup);
+  openModal(editModal);
 });
 
+editButton.addEventListener('click', function () {
+  openModal(addModal);
+});
+
+function closeModal(modal) {
+  modal.classList.remove('popup_is-opened');
+  document.removeEventListener('keydown', closeModalByEsc);
+}
+
+function closeModalByEsc(evt) {
+  if (evt.key.toLowerCase() === 'escape') {
+    const popup = document.querySelector('.popup_is-opened');
+    closeModal(popup);
+  }
+}
+
+function closeModalByClickOnOverlay(evt, popup) {
+  if(evt.target.classList.contains('popup')) {
+    closeModal(popup);
+  };
+}
+
+
+
+// function closeModalByEscape(evt) {
+//   if (evt.key === 'escape') {
+//     addSong(artistInput.value, titleInput.value);
+//   }
+
+//    if (evt.key.toLowerCase() === 'ё') {
+//     evt.preventDefault()
+//   }
+
+//}
 function addCard(card, onRemoveCard) {
   const cardTemplate = document.querySelector('#card-template').content;
   const cardItem = cardTemplate.querySelector('.places__item').cloneNode(true);
