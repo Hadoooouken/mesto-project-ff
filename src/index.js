@@ -1,12 +1,32 @@
-import { initialCards } from '../scripts/cards.js';
+import { initialCards } from './scripts/cards.js';
+
 import '../src/index.css';
+
 const placesList = document.querySelector('.places__list');
-const addButton = document.querySelector('.profile__add-button');
-const editButton = document.querySelector('.profile__edit-button');
-const editModal = document.querySelector('.popup_type_edit');
-const addModal = document.querySelector('.popup_type_new-card');
+
+const addNewCardModal = document.querySelector('.popup_type_new-card');
+const addNewCardForm = addNewCardModal.querySelector('.popup__form');
+const addNewCardButton = document.querySelector('.profile__add-button');
+
+const editProfileModal = document.querySelector('.popup_type_edit');
+const editProfileForm = editProfileModal.querySelector('.popup__form');
+const editProfileButton = document.querySelector('.profile__edit-button');
+
 const modalCloseButton = document.querySelectorAll('.popup__close');
-const formElement = document.querySelector('.popup__form');
+const nameInput = document.querySelector('.popup__input_type_name');
+const jobInput = document.querySelector('.popup__input_type_description');
+const nameInputCurrent = document.querySelector('.profile__title');
+const jobInputCurrent = document.querySelector('.profile__description');
+
+addNewCardModal.querySelector('.pop');
+
+addNewCardButton.addEventListener('click', function () {
+  openModal(addNewCardModal);
+});
+
+editProfileButton.addEventListener('click', function () {
+  openModal(editProfileModal);
+});
 
 modalCloseButton.forEach(function (button) {
   button.addEventListener('click', function () {
@@ -14,29 +34,27 @@ modalCloseButton.forEach(function (button) {
   });
 });
 
-function openModal(modal) {
-  modal.classList.add('popup_is-opened');
-  document.addEventListener('keydown', closeModalByEsc);
-}
-
-addButton.addEventListener('click', function () {
-  openModal(addModal);
+document.addEventListener('click', function (event) {
+  closeModalByClickOnOverlay(event, addNewCardModal);
+  closeModalByClickOnOverlay(event, editProfileModal);
 });
 
-editButton.addEventListener('click', function () {
-  openModal(editModal);
+editProfileForm.addEventListener('submit', handleFormSubmit);
+
+initialCards.forEach(function (card) {
+  const newCard = createCard(card, handleDeleteCard);
+  placesList.append(newCard);
 });
 
-function closeModal(modal) {
-  modal.classList.remove('popup_is-opened');
-  document.removeEventListener('keydown', closeModalByEsc, closeModalByEsc);
-}
+currentValueProfile();
 
-function closeModalByEsc(evt) {
-  if (evt.key.toLowerCase() === 'escape') {
-    const popupOpened = document.querySelector('.popup_is-opened');
-    closeModal(popupOpened);
-  }
+function handleFormSubmit(evt) {
+  evt.preventDefault();
+
+  nameInputCurrent.textContent = nameInput.value;
+  jobInputCurrent.textContent = jobInput.value;
+
+  closeModal(editProfileModal);
 }
 
 function closeModalByClickOnOverlay(event, popup) {
@@ -44,40 +62,13 @@ function closeModalByClickOnOverlay(event, popup) {
     closeModal(popup);
   }
 }
-document.addEventListener('click', function (event) {
-  closeModalByClickOnOverlay(event, addModal);
-  closeModalByClickOnOverlay(event, editModal);
-});
 
+function currentValueProfile() {
+  nameInput.value = nameInputCurrent.textContent;
+  jobInput.value = jobInputCurrent.textContent;
+}
 
-// function fillInProfileFormInputs() {
-//   nameInput.value = defaultNameInput.textContent;
-//   jobInput.value = defaultJobInput.textContent;
-
-// }
-// fillInProfileFormInputs();
-
-// // Находим форму в DOM
-// const formElement = // Воспользуйтесь методом querySelector()
-// // Находим поля формы в DOM
-// const nameInput = // Воспользуйтесь инструментом .querySelector()
-// const jobInput = // Воспользуйтесь инструментом .querySelector()
-
-// // // Обработчик «отправки» формы, хотя пока
-// // // она никуда отправляться не будет
-// function handleFormSubmit(evt) {
-//   evt.preventDefault();
-//   const jobOutput = formElement.elements.description.value;
-//   const nameOutput = formElement.elements.name.value;
-//   const nameInput = document.querySelector('.popup__input_type_name');
-//   const jobInput = document.querySelector('.popup__input_type_description');
-//   nameInput.textContent = nameOutput;
-//   jobInput.textContent = jobOutput;
-// }
-
-// formElement.addEventListener('submit', handleFormSubmit);
-
-function addCard(card, onRemoveCard) {
+function createCard(card, onRemoveCard) {
   const cardTemplate = document.querySelector('#card-template').content;
   const cardItem = cardTemplate.querySelector('.places__item').cloneNode(true);
   const cardImage = cardItem.querySelector('.card__image');
@@ -86,6 +77,9 @@ function addCard(card, onRemoveCard) {
   cardItem.querySelector('.card__title').textContent = card.name;
   cardImage.src = card.link;
   cardImage.alt = card.name;
+  //лайки на карты делаю
+  //const likeCardButton = document.querySelector('.card__like-button')
+
   return cardItem;
 }
 
@@ -93,18 +87,36 @@ function handleDeleteCard(event) {
   event.target.closest('.places__item').remove();
 }
 
-initialCards.forEach(function (card) {
-  const newCard = addCard(card, handleDeleteCard);
-  placesList.append(newCard);
-});
+function openModal(modal) {
+  modal.classList.add('popup_is-opened');
+  document.addEventListener('keydown', closeModalByEsc);
+}
 
-// Функция closeModalByClickOnOverlay принимает два аргумента: event и popup.
-// Первый аргумент, event, представляет собой событие клика. Это означает, что функция будет выполняться каждый раз, когда пользователь
-// кликает на элемент с классом popup. В данном случае, это, вероятно, оверлей модального окна.
-// Второй аргумент, popup, это ссылка на само модальное окно.
-// Внутри функции, мы проверяем, есть ли у цели клика (event.target) класс popup. Если да, то мы вызываем функцию closeModal с
-// аргументом popup, который, вероятно, закрывает модальное окно.
-// В итоге, функция проверяет, был ли клик по оверлею модального окна, и если да, то закрывает это модальное окно.
-// Затем, в коде, который вы предоставили, мы добавляем слушатель события click на документ. Когда пользователь кликает на страницу,
-//  мы вызываем функцию closeModalByClickOnOverlay, передавая ей event (событие клика) и addModal или editModal (в зависимости от того,
-//    какое модальное окно было открыто). Это делает код, который мы рассмотрели, более понятным и функциональным.
+function closeModal(modal) {
+  modal.classList.remove('popup_is-opened');
+  document.removeEventListener('keydown', closeModalByEsc);
+}
+
+function closeModalByEsc(evt) {
+    if (evt.key && evt.key.toLowerCase() === 'escape') {
+      const popupOpened = document.querySelector('.popup_is-opened');
+      closeModal(popupOpened);
+    }
+    
+}
+
+addNewCardForm.addEventListener('submit', (evt) => {
+  evt.preventDefault();
+  const inputName = addNewCardForm.querySelector(
+    '.popup__input_type_card-name'
+  );
+  const inputUrl = addNewCardForm.querySelector('.popup__input_type_url');
+  console.log(inputUrl);
+  const card = {
+    name: inputName.value,
+    link: inputUrl.value,
+  };
+  const newCard = createCard(card, handleDeleteCard);
+
+  placesList.prepend(newCard);
+});
