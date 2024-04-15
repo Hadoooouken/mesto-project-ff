@@ -18,7 +18,7 @@ const jobInput = document.querySelector('.popup__input_type_description');
 const nameInputCurrent = document.querySelector('.profile__title');
 const jobInputCurrent = document.querySelector('.profile__description');
 
-addNewCardModal.querySelector('.pop');
+const imageModal = document.querySelector('.popup_type_image')
 
 addNewCardButton.addEventListener('click', function () {
   openModal(addNewCardModal);
@@ -42,7 +42,7 @@ document.addEventListener('click', function (event) {
 editProfileForm.addEventListener('submit', handleFormSubmit);
 
 initialCards.forEach(function (card) {
-  const newCard = createCard(card, handleDeleteCard);
+  const newCard = createCard(card, handleDeleteCard, handleLikeCard);
   placesList.append(newCard);
 });
 
@@ -50,10 +50,8 @@ currentValueProfile();
 
 function handleFormSubmit(evt) {
   evt.preventDefault();
-
   nameInputCurrent.textContent = nameInput.value;
   jobInputCurrent.textContent = jobInput.value;
-
   closeModal(editProfileModal);
 }
 
@@ -68,19 +66,25 @@ function currentValueProfile() {
   jobInput.value = jobInputCurrent.textContent;
 }
 
-function createCard(card, onRemoveCard) {
+function createCard(card, onRemoveCard, likeCard) {
   const cardTemplate = document.querySelector('#card-template').content;
   const cardItem = cardTemplate.querySelector('.places__item').cloneNode(true);
   const cardImage = cardItem.querySelector('.card__image');
   const deleteButton = cardItem.querySelector('.card__delete-button');
+  const likeButton = cardItem.querySelector('.card__like-button');
   deleteButton.addEventListener('click', onRemoveCard);
+  likeButton.addEventListener('click', likeCard);
   cardItem.querySelector('.card__title').textContent = card.name;
   cardImage.src = card.link;
   cardImage.alt = card.name;
-  //лайки на карты делаю
-  //const likeCardButton = document.querySelector('.card__like-button')
 
-  return cardItem;
+ return cardItem;
+}
+
+function handleLikeCard(event) {
+if (event.target.classList.contains('card__like-button')) {
+  event.target.classList.toggle('card__like-button_is-active');
+}
 }
 
 function handleDeleteCard(event) {
@@ -98,11 +102,10 @@ function closeModal(modal) {
 }
 
 function closeModalByEsc(evt) {
-    if (evt.key && evt.key.toLowerCase() === 'escape') {
-      const popupOpened = document.querySelector('.popup_is-opened');
-      closeModal(popupOpened);
-    }
-    
+  if (evt.key && evt.key.toLowerCase() === 'escape') {
+    const popupOpened = document.querySelector('.popup_is-opened');
+    closeModal(popupOpened);
+  }
 }
 
 addNewCardForm.addEventListener('submit', (evt) => {
@@ -111,12 +114,13 @@ addNewCardForm.addEventListener('submit', (evt) => {
     '.popup__input_type_card-name'
   );
   const inputUrl = addNewCardForm.querySelector('.popup__input_type_url');
-  console.log(inputUrl);
   const card = {
     name: inputName.value,
     link: inputUrl.value,
   };
-  const newCard = createCard(card, handleDeleteCard);
-
+  const newCard = createCard(card, handleDeleteCard, handleLikeCard);
+  console.log(card)
+  addNewCardForm.reset();
+  closeModal(addNewCardModal);
   placesList.prepend(newCard);
 });
