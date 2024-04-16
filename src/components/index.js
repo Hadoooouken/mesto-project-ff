@@ -43,15 +43,15 @@ modalCloseButtons.forEach(function (button) {
   });
 });
 
-addNewCardModal.addEventListener('click', function (event) {
+addNewCardModal.addEventListener('mousedown', function (event) {
   closeModalByClickOnOverlay(event, addNewCardModal);
 });
 
-editProfileModal.addEventListener('click', function (event) {
+editProfileModal.addEventListener('mousedown', function (event) {
   closeModalByClickOnOverlay(event, editProfileModal);
 });
 
-imageModal.addEventListener('click', function (event) {
+imageModal.addEventListener('mousedown', function (event) {
   closeModalByClickOnOverlay(event, imageModal);
 });
 
