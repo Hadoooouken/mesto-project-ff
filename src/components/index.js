@@ -1,6 +1,9 @@
-import { initialCards } from './scripts/cards.js';
+import { initialCards, createCard, handleLikeCard, handleDeleteCard } from './cards.js';
 
-import '../src/index.css';
+import { openModal, closeModal, closeModalByClickOnOverlay } from './modal.js';
+
+import '/src/index.css';
+
 
 const placesList = document.querySelector('.places__list');
 
@@ -62,33 +65,9 @@ function handleFormSubmit(evt) {
   closeModal(editProfileModal);
 }
 
-function closeModalByClickOnOverlay(event, popup) {
-  if (event.target.classList.contains('popup')) {
-    closeModal(popup);
-  }
-}
-
 function currentValueProfile() {
   nameInput.value = nameInputCurrent.textContent;
   jobInput.value = jobInputCurrent.textContent;
-}
-
-function createCard(card, onRemoveCard, addLikeCard, openImage) {
-  const cardTemplate = document.querySelector('#card-template').content;
-  const cardItem = cardTemplate.querySelector('.places__item').cloneNode(true);
-  const cardImage = cardItem.querySelector('.card__image');
-  const deleteButton = cardItem.querySelector('.card__delete-button');
-  const likeButton = cardItem.querySelector('.card__like-button');
-  deleteButton.addEventListener('click', onRemoveCard);
-  likeButton.addEventListener('click', addLikeCard);
-  cardItem.querySelector('.card__title').textContent = card.name;
-  cardImage.src = card.link;
-  cardImage.alt = card.name;
-  cardImage.addEventListener('click', function () {
-    openImage(card);
-  });
-
-  return cardItem;
 }
 
 function openImageModal(card) {
@@ -99,33 +78,6 @@ function openImageModal(card) {
   imageModalCaption.textContent = card.name;
 
   openModal(imageModal);
-}
-
-function handleLikeCard(event) {
-  if (event.target.classList.contains('card__like-button')) {
-    event.target.classList.toggle('card__like-button_is-active');
-  }
-}
-
-function handleDeleteCard(event) {
-  event.target.closest('.places__item').remove();
-}
-
-function openModal(modal) {
-  modal.classList.add('popup_is-opened');
-  document.addEventListener('keydown', closeModalByEsc);
-}
-
-function closeModal(modal) {
-  modal.classList.remove('popup_is-opened');
-  document.removeEventListener('keydown', closeModalByEsc);
-}
-
-function closeModalByEsc(evt) {
-  if (evt.key && evt.key.toLowerCase() === 'escape') {
-    const popupOpened = document.querySelector('.popup_is-opened');
-    closeModal(popupOpened);
-  }
 }
 
 addNewCardForm.addEventListener('submit', function (evt) {
@@ -146,3 +98,8 @@ addNewCardForm.addEventListener('submit', function (evt) {
   closeModal(addNewCardModal);
   placesList.prepend(newCard);
 });
+
+
+
+
+
