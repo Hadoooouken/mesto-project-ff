@@ -1,9 +1,10 @@
-import { initialCards, createCard, handleLikeCard, handleDeleteCard } from './cards.js';
+import { createCard, handleLikeCard, handleDeleteCard } from './cards.js';
+
+import { initialCards } from './initialCards.js';
 
 import { openModal, closeModal, closeModalByClickOnOverlay } from './modal.js';
 
 import '/src/index.css';
-
 
 const placesList = document.querySelector('.places__list');
 
@@ -15,14 +16,18 @@ const editProfileModal = document.querySelector('.popup_type_edit');
 const editProfileForm = editProfileModal.querySelector('.popup__form');
 const editProfileButton = document.querySelector('.profile__edit-button');
 
-const modalCloseButton = document.querySelectorAll('.popup__close');
+const modalCloseButtons = document.querySelectorAll('.popup__close');
 const nameInput = document.querySelector('.popup__input_type_name');
 const jobInput = document.querySelector('.popup__input_type_description');
 const nameInputCurrent = document.querySelector('.profile__title');
 const jobInputCurrent = document.querySelector('.profile__description');
 
 const imageModal = document.querySelector('.popup_type_image');
+const imageModalImage = imageModal.querySelector('.popup__image');
+const imageModalCaption = imageModal.querySelector('.popup__caption');
 
+const inputName = addNewCardForm.querySelector('.popup__input_type_card-name');
+const inputUrl = addNewCardForm.querySelector('.popup__input_type_url');
 
 addNewCardButton.addEventListener('click', function () {
   openModal(addNewCardModal);
@@ -32,19 +37,25 @@ editProfileButton.addEventListener('click', function () {
   openModal(editProfileModal);
 });
 
-modalCloseButton.forEach(function (button) {
+modalCloseButtons.forEach(function (button) {
   button.addEventListener('click', function () {
     button.closest('.popup').classList.remove('popup_is-opened');
   });
 });
 
-document.addEventListener('click', function (event) {
+addNewCardModal.addEventListener('click', function (event) {
   closeModalByClickOnOverlay(event, addNewCardModal);
+});
+
+editProfileModal.addEventListener('click', function (event) {
   closeModalByClickOnOverlay(event, editProfileModal);
+});
+
+imageModal.addEventListener('click', function (event) {
   closeModalByClickOnOverlay(event, imageModal);
 });
 
-editProfileForm.addEventListener('submit', handleFormSubmit);
+editProfileForm.addEventListener('submit', handleProfileFormSubmit);
 
 initialCards.forEach(function (card) {
   const newCard = createCard(
@@ -56,34 +67,29 @@ initialCards.forEach(function (card) {
   placesList.append(newCard);
 });
 
-currentValueProfile();
+fillProfileInputs();
 
-function handleFormSubmit(evt) {
+function handleProfileFormSubmit(evt) {
   evt.preventDefault();
   nameInputCurrent.textContent = nameInput.value;
   jobInputCurrent.textContent = jobInput.value;
   closeModal(editProfileModal);
 }
 
-function currentValueProfile() {
+function fillProfileInputs() {
   nameInput.value = nameInputCurrent.textContent;
   jobInput.value = jobInputCurrent.textContent;
 }
 
 function openImageModal(card) {
-  const imageModalImage = imageModal.querySelector('.popup__image');
-  const imageModalCaption = imageModal.querySelector('.popup__caption');
   imageModalImage.src = card.link;
   imageModalImage.alt = card.name;
   imageModalCaption.textContent = card.name;
-
   openModal(imageModal);
 }
 
 addNewCardForm.addEventListener('submit', function (evt) {
   evt.preventDefault();
-  const inputName = addNewCardForm.querySelector('.popup__input_type_card-name');
-  const inputUrl = addNewCardForm.querySelector('.popup__input_type_url');
   const card = {
     name: inputName.value,
     link: inputUrl.value,
@@ -98,8 +104,3 @@ addNewCardForm.addEventListener('submit', function (evt) {
   closeModal(addNewCardModal);
   placesList.prepend(newCard);
 });
-
-
-
-
-
