@@ -15,15 +15,10 @@ export function closeModalByClickOnOverlay(event, popup) {
 }
 
 export function closeModalByEsc(evt) {
-  
-  const popupOpened = document.querySelector('.popup_is-opened');
-  if (popupOpened) {
-    popupOpened.classList.remove('.popup_is-opened');
-    if (evt.key) {
-      if (evt.key.toLowerCase() === 'escape') {
-        closeModal(popupOpened);
-      }
+  if (evt.key) {
+    if (evt.key.toLowerCase() === 'escape') {
+      const popupOpened = document.querySelector('.popup_is-opened');
+      closeModal(popupOpened);
     }
   }
 }
-

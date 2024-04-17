@@ -39,20 +39,14 @@ editProfileButton.addEventListener('click', function () {
 
 modalCloseButtons.forEach(function (button) {
   button.addEventListener('click', function () {
-    button.closest('.popup').classList.remove('popup_is-opened');
+  closeModal(button.closest('.popup'))
   });
 });
 
-addNewCardModal.addEventListener('mousedown', function (event) {
-  closeModalByClickOnOverlay(event, addNewCardModal);
-});
-
-editProfileModal.addEventListener('mousedown', function (event) {
-  closeModalByClickOnOverlay(event, editProfileModal);
-});
-
-imageModal.addEventListener('mousedown', function (event) {
-  closeModalByClickOnOverlay(event, imageModal);
+[addNewCardModal, editProfileModal, imageModal].forEach((modal) => {
+  modal.addEventListener("mousedown", function (event) {
+    closeModalByClickOnOverlay(event, modal);
+  });
 });
 
 editProfileForm.addEventListener('submit', handleProfileFormSubmit);
