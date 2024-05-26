@@ -4,6 +4,8 @@ import { initialCards } from './initialCards.js';
 
 import { openModal, closeModal, closeModalByClickOnOverlay } from './modal.js';
 
+import {enableValidation, clearValidation, validationConfig} from './validation.js';
+
 import '/src/index.css';
 
 const placesList = document.querySelector('.places__list');
@@ -34,22 +36,27 @@ addNewCardButton.addEventListener('click', function () {
 });
 
 editProfileButton.addEventListener('click', function () {
+  const formElement = editProfileModal.querySelector(validationConfig.formSelector)
   openModal(editProfileModal);
+  fillProfileInputs()
+  clearValidation(formElement, validationConfig)
 });
+
+editProfileForm.addEventListener('submit', handleProfileFormSubmit);
 
 modalCloseButtons.forEach(function (button) {
   button.addEventListener('click', function () {
-  closeModal(button.closest('.popup'))
+    closeModal(button.closest('.popup'));
+    const formElement = button.closest('.popup').querySelector(validationConfig.formSelector);
+    clearValidation(formElement, validationConfig);
   });
 });
 
 [addNewCardModal, editProfileModal, imageModal].forEach((modal) => {
-  modal.addEventListener("mousedown", function (event) {
+  modal.addEventListener('mousedown', function (event) {
     closeModalByClickOnOverlay(event, modal);
   });
 });
-
-editProfileForm.addEventListener('submit', handleProfileFormSubmit);
 
 initialCards.forEach(function (card) {
   const newCard = createCard(
@@ -62,6 +69,8 @@ initialCards.forEach(function (card) {
 });
 
 fillProfileInputs();
+
+enableValidation(validationConfig);
 
 function handleProfileFormSubmit(evt) {
   evt.preventDefault();
@@ -84,10 +93,12 @@ function openImageModal(card) {
 
 addNewCardForm.addEventListener('submit', function (evt) {
   evt.preventDefault();
+const formElement = addNewCardModal.querySelector(validationConfig.formSelector)
   const card = {
     name: inputName.value,
     link: inputUrl.value,
   };
+
   const newCard = createCard(
     card,
     handleDeleteCard,
@@ -96,5 +107,7 @@ addNewCardForm.addEventListener('submit', function (evt) {
   );
   addNewCardForm.reset();
   closeModal(addNewCardModal);
+  clearValidation(formElement, validationConfig);
   placesList.prepend(newCard);
+  
 });

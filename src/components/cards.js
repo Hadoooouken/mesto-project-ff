@@ -15,6 +15,7 @@ export function createCard(card, onRemoveCard, addLikeCard, openImage) {
   
   return cardItem;
 }
+
 export function handleLikeCard(event) {
   if (event.target.classList.contains('card__like-button')) {
     event.target.classList.toggle('card__like-button_is-active');
