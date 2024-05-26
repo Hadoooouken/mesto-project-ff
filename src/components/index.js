@@ -49,6 +49,7 @@ modalCloseButtons.forEach(function (button) {
     closeModal(button.closest('.popup'));
     const formElement = button.closest('.popup').querySelector(validationConfig.formSelector);
     clearValidation(formElement, validationConfig);
+    addNewCardForm.reset();
   });
 });
 
