@@ -81,6 +81,7 @@ function toggleButtonState(inputList, buttonElement) {
 
 export function clearValidation (formElement, validationConfig) {
   const submitButton = formElement.querySelector(validationConfig.submitButtonSelector)
+  console.log(submitButton)
   submitButton.disabled = true
   submitButton.classList.add(validationConfig.inactiveButtonClass);
   

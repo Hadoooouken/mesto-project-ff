@@ -32,6 +32,9 @@ const inputName = addNewCardForm.querySelector('.popup__input_type_card-name');
 const inputUrl = addNewCardForm.querySelector('.popup__input_type_url');
 
 addNewCardButton.addEventListener('click', function () {
+  const formElement = addNewCardModal.querySelector(validationConfig.formSelector);
+  clearValidation(formElement, validationConfig);
+  addNewCardForm.reset(); //переместил функционал сюда из modalCloseButtons
   openModal(addNewCardModal);
 });
 
@@ -47,9 +50,9 @@ editProfileForm.addEventListener('submit', handleProfileFormSubmit);
 modalCloseButtons.forEach(function (button) {
   button.addEventListener('click', function () {
     closeModal(button.closest('.popup'));
-    const formElement = button.closest('.popup').querySelector(validationConfig.formSelector);
-    clearValidation(formElement, validationConfig);
-    addNewCardForm.reset();
+    // const formElement = button.closest('.popup').querySelector(validationConfig.formSelector);
+    // clearValidation(formElement, validationConfig);
+    // addNewCardForm.reset();  баг нашел, при закрытии увеличенной картинки на крестик - не может прочитать свойста querySelector
   });
 });
 
