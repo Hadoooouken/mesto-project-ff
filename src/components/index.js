@@ -4,7 +4,11 @@ import { initialCards } from './initialCards.js';
 
 import { openModal, closeModal, closeModalByClickOnOverlay } from './modal.js';
 
-import {enableValidation, clearValidation, validationConfig} from './validation.js';
+import {
+  enableValidation,
+  clearValidation,
+  validationConfig,
+} from './validation.js';
 
 import '/src/index.css';
 
@@ -32,17 +36,21 @@ const inputName = addNewCardForm.querySelector('.popup__input_type_card-name');
 const inputUrl = addNewCardForm.querySelector('.popup__input_type_url');
 
 addNewCardButton.addEventListener('click', function () {
-  const formElement = addNewCardModal.querySelector(validationConfig.formSelector);
+  const formElement = addNewCardModal.querySelector(
+    validationConfig.formSelector
+  );
   clearValidation(formElement, validationConfig);
   addNewCardForm.reset(); //переместил функционал сюда из modalCloseButtons
   openModal(addNewCardModal);
 });
 
 editProfileButton.addEventListener('click', function () {
-  const formElement = editProfileModal.querySelector(validationConfig.formSelector)
+  const formElement = editProfileModal.querySelector(
+    validationConfig.formSelector
+  );
   openModal(editProfileModal);
-  fillProfileInputs()
-  clearValidation(formElement, validationConfig)
+  fillProfileInputs();
+  clearValidation(formElement, validationConfig);
 });
 
 editProfileForm.addEventListener('submit', handleProfileFormSubmit);
@@ -61,16 +69,11 @@ modalCloseButtons.forEach(function (button) {
     closeModalByClickOnOverlay(event, modal);
   });
 });
-
-initialCards.forEach(function (card) {
-  const newCard = createCard(
-    card,
-    handleDeleteCard,
-    handleLikeCard,
-    openImageModal
-  );
-  placesList.append(newCard);
-});
+//старый способ вывода карточек на страницу
+// initialCards.forEach(function (card) {
+//   const newCard = createCard(card,handleDeleteCard,handleLikeCard,openImageModal);
+//   placesList.append(newCard);
+// });
 
 fillProfileInputs();
 
@@ -97,7 +100,9 @@ function openImageModal(card) {
 
 addNewCardForm.addEventListener('submit', function (evt) {
   evt.preventDefault();
-const formElement = addNewCardModal.querySelector(validationConfig.formSelector)
+  const formElement = addNewCardModal.querySelector(
+    validationConfig.formSelector
+  );
   const card = {
     name: inputName.value,
     link: inputUrl.value,
@@ -113,5 +118,134 @@ const formElement = addNewCardModal.querySelector(validationConfig.formSelector)
   closeModal(addNewCardModal);
   clearValidation(formElement, validationConfig);
   placesList.prepend(newCard);
-  
 });
+
+
+const serverURL = 'https://nomoreparties.co/v1/wff-cohort-14/';
+const token = '87aba88c-73fd-4f0c-8e8e-c85e9a40fa5a';
+let userId; //id авторизованного пользователя
+
+const fetchUserId = (id) => {
+  userId = id;
+}; // получить id пользователя
+
+// запрашиваем данные о пользователе
+const fetchUserData = () => {
+  return fetch(`${serverURL}users/me`, {
+    method: 'GET',
+    headers: {
+      authorization: token,
+    },
+  })
+    .then((res) => res.json())
+    .then((res) => {
+      fetchUserId(res['_id']);
+     // console.log(res);
+      return res;
+    });
+};
+
+
+
+//забираем карточки с сервера
+const fetchCards = () => {
+  return fetch(`${serverURL}cards`, {
+    method: 'GET',
+    headers: {
+      authorization: token,
+    },
+  })
+    .then((res) => res.json())
+    // .then((res) => {
+    //   console.log(res);
+    // });
+};
+
+
+// функция, отображающая данные пользователя на странице
+function renderUserData() {
+  fetchUserData()
+  .then((res) => {
+    nameInputCurrent.textContent = res.name;
+    jobInputCurrent.textContent = res.about;
+   // profileAvatar.style['background-image'] = `url("${res.avatar}")`;
+    // смена дефолтных значений в инпутах при первом открытии страницы
+    editProfileForm.elements.name.defaultValue = res.name;
+    editProfileForm.elements.description.defaultValue = res.about;
+  })
+  
+}
+//выводим карточки на страницу
+function addInitialCards() {
+  fetchCards()
+    .then((res) => {
+      res.forEach(function (card) {
+        const newCard = createCard(card,handleDeleteCard,handleLikeCard,openImageModal);
+        placesList.append(newCard);
+      });
+    })
+  }
+
+
+
+
+//промисс с юзером и карточками
+const promises = [renderUserData, addInitialCards];
+Promise.all(promises)
+  .then((resArr) => resArr.forEach(res => res()))
+  
+
+
+
+  //   export const UserData = (name, about) => {
+//      return fetch(`${serverURL}users/me`, {
+//       method: 'PATCH',
+//       headers: {
+//         authorization: token,
+//         'Content-type': 'application/json'
+//       },
+//       body: JSON.stringify({
+//         name: name,
+//         about: about
+//       }).then(res => res.json())
+//       .then((result) => {
+//         console.log(result);
+//       })
+//     });
+//   }
+
+//с урока списывал
+
+// const handleResponse = (res) => {
+//   if(res.ok) {
+//     return res.json()
+//   }
+// }
+// const getAllToDos = () => {
+//   return fetch(serverURL, {
+//     method: 'GET',
+//     headers: {
+//       authorization: token,
+//         }
+//        }) .then(handleResponse)
+
+// }
+
+// const createToDo = () => {
+//   return fetch(serverURL, {
+//     method: 'POST',
+//     headers: {
+//       authorization: token,
+//       'Content-type': 'application/json',
+//       },
+//       body: JSON.stringify({
+//         name: name,
+//         link: link,
+//       }),
+//        }) .then(handleResponse)
+// }
+
+// Promise.all([getAllToDos(), createToDo()])
+// .then(([todos, newCard]) => {
+//   console.log(todos, newCard)
+// })
