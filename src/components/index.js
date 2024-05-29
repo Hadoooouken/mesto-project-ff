@@ -1,6 +1,5 @@
 import { createCard, handleLikeCard, handleDeleteCard } from './cards.js';
 
-import { initialCards } from './initialCards.js';
 
 import { openModal, closeModal, closeModalByClickOnOverlay } from './modal.js';
 
@@ -22,11 +21,17 @@ const editProfileModal = document.querySelector('.popup_type_edit');
 const editProfileForm = editProfileModal.querySelector('.popup__form');
 const editProfileButton = document.querySelector('.profile__edit-button');
 
+
 const modalCloseButtons = document.querySelectorAll('.popup__close');
 const nameInput = document.querySelector('.popup__input_type_name');
 const jobInput = document.querySelector('.popup__input_type_description');
-const nameInputCurrent = document.querySelector('.profile__title');
-const jobInputCurrent = document.querySelector('.profile__description');
+const nameInputCurrent = document.querySelector('.profile__title'); 
+const jobInputCurrent = document.querySelector('.profile__description'); 
+
+
+
+
+
 
 const imageModal = document.querySelector('.popup_type_image');
 const imageModalImage = imageModal.querySelector('.popup__image');
@@ -53,7 +58,7 @@ editProfileButton.addEventListener('click', function () {
   clearValidation(formElement, validationConfig);
 });
 
-editProfileForm.addEventListener('submit', handleProfileFormSubmit);
+editProfileForm.addEventListener('submit', handleProfileFormSubmit) ;
 
 modalCloseButtons.forEach(function (button) {
   button.addEventListener('click', function () {
@@ -69,11 +74,7 @@ modalCloseButtons.forEach(function (button) {
     closeModalByClickOnOverlay(event, modal);
   });
 });
-//старый способ вывода карточек на страницу
-// initialCards.forEach(function (card) {
-//   const newCard = createCard(card,handleDeleteCard,handleLikeCard,openImageModal);
-//   placesList.append(newCard);
-// });
+
 
 fillProfileInputs();
 
@@ -83,7 +84,9 @@ function handleProfileFormSubmit(evt) {
   evt.preventDefault();
   nameInputCurrent.textContent = nameInput.value;
   jobInputCurrent.textContent = jobInput.value;
-  closeModal(editProfileModal);
+  updateUserData(nameInput.value, jobInput.value)
+  .catch((err) => console.log(err))
+  .finally(() => closeModal(editProfileModal))
 }
 
 function fillProfileInputs() {
@@ -120,7 +123,6 @@ addNewCardForm.addEventListener('submit', function (evt) {
   placesList.prepend(newCard);
 });
 
-
 const serverURL = 'https://nomoreparties.co/v1/wff-cohort-14/';
 const token = '87aba88c-73fd-4f0c-8e8e-c85e9a40fa5a';
 let userId; //id авторизованного пользователя
@@ -140,12 +142,9 @@ const fetchUserData = () => {
     .then((res) => res.json())
     .then((res) => {
       fetchUserId(res['_id']);
-     // console.log(res);
       return res;
     });
 };
-
-
 
 //забираем карточки с сервера
 const fetchCards = () => {
@@ -154,13 +153,11 @@ const fetchCards = () => {
     headers: {
       authorization: token,
     },
-  })
-    .then((res) => res.json())
-    // .then((res) => {
-    //   console.log(res);
-    // });
+  }).then((res) => res.json());
+  // .then((res) => {
+  //   console.log(res);
+  // });
 };
-
 
 // функция, отображающая данные пользователя на странице
 function renderUserData() {
@@ -168,53 +165,56 @@ function renderUserData() {
   .then((res) => {
     nameInputCurrent.textContent = res.name;
     jobInputCurrent.textContent = res.about;
-   // profileAvatar.style['background-image'] = `url("${res.avatar}")`;
-    // смена дефолтных значений в инпутах при первом открытии страницы
-    editProfileForm.elements.name.defaultValue = res.name;
-    editProfileForm.elements.description.defaultValue = res.about;
-  })
+    editProfileForm.elements['name-input'].value = res.name
+    editProfileForm.elements['description-input'].value = res.about
   
+  })
+  .catch((err) => console.log(err));
 }
 //выводим карточки на страницу
 function addInitialCards() {
-  fetchCards()
-    .then((res) => {
-      res.forEach(function (card) {
-        const newCard = createCard(card,handleDeleteCard,handleLikeCard,openImageModal);
-        placesList.append(newCard);
-      });
-    })
-  }
-
-
-
+  fetchCards().then((res) => {
+    res.forEach(function (card) {
+      const newCard = createCard(
+        card,
+        handleDeleteCard,
+        handleLikeCard,
+        openImageModal
+      );
+      placesList.append(newCard);
+    });
+  });
+}
 
 //промисс с юзером и карточками
 const promises = [renderUserData, addInitialCards];
-Promise.all(promises)
-  .then((resArr) => resArr.forEach(res => res()))
-  
+Promise.all(promises).then((resArr) => resArr.forEach((res) => res()));
 
 
 
-  //   export const UserData = (name, about) => {
-//      return fetch(`${serverURL}users/me`, {
-//       method: 'PATCH',
-//       headers: {
-//         authorization: token,
-//         'Content-type': 'application/json'
-//       },
-//       body: JSON.stringify({
-//         name: name,
-//         about: about
-//       }).then(res => res.json())
-//       .then((result) => {
-//         console.log(result);
-//       })
-//     });
-//   }
+const updateUserData = (name, about) => {
+  return fetch(`${serverURL}users/me`, {
+    method: 'PATCH',
+    headers: {
+      authorization: token,
+      'Content-type': 'application/json',
+    },
+    body: JSON.stringify({
+      name: name,
+      about: about,
+    }),
+  });
+};
 
-//с урока списывал
+
+
+
+
+
+
+
+
+//с урока писал
 
 // const handleResponse = (res) => {
 //   if(res.ok) {
