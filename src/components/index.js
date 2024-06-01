@@ -1,6 +1,5 @@
 import { createCard, handleLikeCard, handleDeleteCard } from './cards.js';
 
-
 import { openModal, closeModal, closeModalByClickOnOverlay } from './modal.js';
 
 import {
@@ -8,6 +7,18 @@ import {
   clearValidation,
   validationConfig,
 } from './validation.js';
+
+import {
+  userId,
+  fetchUserId,
+  fetchUserData,
+  fetchCards,
+  updateUserData,
+  fetchAddСardToServer,
+  fetchDeleteCardFromServer,
+  addLike,
+  removeLike,
+} from './api.js';
 
 import '/src/index.css';
 
@@ -21,17 +32,11 @@ const editProfileModal = document.querySelector('.popup_type_edit');
 const editProfileForm = editProfileModal.querySelector('.popup__form');
 const editProfileButton = document.querySelector('.profile__edit-button');
 
-
 const modalCloseButtons = document.querySelectorAll('.popup__close');
 const nameInput = document.querySelector('.popup__input_type_name');
 const jobInput = document.querySelector('.popup__input_type_description');
-const nameInputCurrent = document.querySelector('.profile__title'); 
-const jobInputCurrent = document.querySelector('.profile__description'); 
-
-
-
-
-
+const nameInputCurrent = document.querySelector('.profile__title');
+const jobInputCurrent = document.querySelector('.profile__description');
 
 const imageModal = document.querySelector('.popup_type_image');
 const imageModalImage = imageModal.querySelector('.popup__image');
@@ -58,14 +63,11 @@ editProfileButton.addEventListener('click', function () {
   clearValidation(formElement, validationConfig);
 });
 
-editProfileForm.addEventListener('submit', handleProfileFormSubmit) ;
+editProfileForm.addEventListener('submit', handleProfileFormSubmit);
 
 modalCloseButtons.forEach(function (button) {
   button.addEventListener('click', function () {
     closeModal(button.closest('.popup'));
-    // const formElement = button.closest('.popup').querySelector(validationConfig.formSelector);
-    // clearValidation(formElement, validationConfig);
-    // addNewCardForm.reset();  баг нашел, при закрытии увеличенной картинки на крестик - не может прочитать свойста querySelector
   });
 });
 
@@ -75,7 +77,6 @@ modalCloseButtons.forEach(function (button) {
   });
 });
 
-
 fillProfileInputs();
 
 enableValidation(validationConfig);
@@ -84,9 +85,9 @@ function handleProfileFormSubmit(evt) {
   evt.preventDefault();
   nameInputCurrent.textContent = nameInput.value;
   jobInputCurrent.textContent = jobInput.value;
-  updateUserData(nameInput.value, jobInput.value)
-  .catch((err) => console.log(err))
-  .finally(() => closeModal(editProfileModal))
+  updateUserData(nameInput.value, jobInput.value).finally(() =>
+    closeModal(editProfileModal)
+  );
 }
 
 function fillProfileInputs() {
@@ -99,6 +100,32 @@ function openImageModal(card) {
   imageModalImage.alt = card.name;
   imageModalCaption.textContent = card.name;
   openModal(imageModal);
+}
+
+// функция, отображающая данные пользователя на странице
+function renderUserData() {
+  fetchUserData()
+    .then((res) => {
+      nameInputCurrent.textContent = res.name;
+      jobInputCurrent.textContent = res.about;
+      editProfileForm.elements['name-input'].value = res.name;
+      editProfileForm.elements['description-input'].value = res.about;
+    })
+    .catch((err) => console.log(err));
+}
+//выводим карточки на страницу
+function addInitialCards() {
+  fetchCards().then((res) => {
+    res.forEach(function (card) {
+      const newCard = createCard(
+        card,
+        handleDeleteCard,
+        handleLikeCard,
+        openImageModal
+      );
+      placesList.append(newCard);
+    });
+  });
 }
 
 addNewCardForm.addEventListener('submit', function (evt) {
@@ -117,102 +144,46 @@ addNewCardForm.addEventListener('submit', function (evt) {
     handleLikeCard,
     openImageModal
   );
+  fetchAddСardToServer(inputName.value, inputUrl.value);
   addNewCardForm.reset();
   closeModal(addNewCardModal);
   clearValidation(formElement, validationConfig);
   placesList.prepend(newCard);
 });
 
-const serverURL = 'https://nomoreparties.co/v1/wff-cohort-14/';
-const token = '87aba88c-73fd-4f0c-8e8e-c85e9a40fa5a';
-let userId; //id авторизованного пользователя
-
-const fetchUserId = (id) => {
-  userId = id;
-}; // получить id пользователя
-
-// запрашиваем данные о пользователе
-const fetchUserData = () => {
-  return fetch(`${serverURL}users/me`, {
-    method: 'GET',
-    headers: {
-      authorization: token,
-    },
-  })
-    .then((res) => res.json())
-    .then((res) => {
-      fetchUserId(res['_id']);
-      return res;
-    });
-};
-
-//забираем карточки с сервера
-const fetchCards = () => {
-  return fetch(`${serverURL}cards`, {
-    method: 'GET',
-    headers: {
-      authorization: token,
-    },
-  }).then((res) => res.json());
-  // .then((res) => {
-  //   console.log(res);
-  // });
-};
-
-// функция, отображающая данные пользователя на странице
-function renderUserData() {
-  fetchUserData()
-  .then((res) => {
-    nameInputCurrent.textContent = res.name;
-    jobInputCurrent.textContent = res.about;
-    editProfileForm.elements['name-input'].value = res.name
-    editProfileForm.elements['description-input'].value = res.about
-  
-  })
-  .catch((err) => console.log(err));
-}
-//выводим карточки на страницу
-function addInitialCards() {
-  fetchCards().then((res) => {
-    res.forEach(function (card) {
-      const newCard = createCard(
-        card,
-        handleDeleteCard,
-        handleLikeCard,
-        openImageModal
-      );
-      placesList.append(newCard);
-    });
-  });
-}
-
 //промисс с юзером и карточками
 const promises = [renderUserData, addInitialCards];
-Promise.all(promises).then((resArr) => resArr.forEach((res) => res()));
+Promise.all(promises)
+.then((arr) => arr.forEach((res) => res()));
 
+//функция на удаление карточки
 
+//функция на удаление карточки изначальная
+// function deleteCardFromServer(evt) {
+//   const id = evt.target.id;
+//   const card = document.getElementById(id);
+//   fetchDeleteCardFromServer(card.id)
+//   .then(() => {
+//     card.remove();
+//   })
 
-const updateUserData = (name, about) => {
-  return fetch(`${serverURL}users/me`, {
-    method: 'PATCH',
-    headers: {
-      authorization: token,
-      'Content-type': 'application/json',
-    },
-    body: JSON.stringify({
-      name: name,
-      about: about,
-    }),
-  });
-};
+// }
 
+// const handleLikeIconClick = (cardID, likeButton, likesCount) => {
+//   const isLiked = likeButton.classList.contains("card__like-button_is-active"); // смотрим лайкнута ли карточка или нет
+//   функцияЗапросаЛайка(cardID, !isLiked) // можно объединить в одну, и на основе isLiked понимать лайк или снятие лайка
+//     .then((cardData) => {
+//        // переключаем лайкнутость
+// // изменяем количество лайков исходя из длины массива
+//     })
+//     .catch((err) => (...));
+// };
 
+// // чтобы у нас имеклись все необходимые данные для вычисления isLiked и т.д., вызываем нашу функцию следующим образом
 
-
-
-
-
-
+//  likeButton.addEventListener("click", () =>
+//       onLike(data._id, likeButton, likesCount) // по сколько карточка создается с сервера, в ней должны быть данные name, link, id и прочее. Если их нет - добавь. Удобнее данные карточки передавать объектом, а не по одному.
+//     );
 
 //с урока писал
 
@@ -221,31 +192,3 @@ const updateUserData = (name, about) => {
 //     return res.json()
 //   }
 // }
-// const getAllToDos = () => {
-//   return fetch(serverURL, {
-//     method: 'GET',
-//     headers: {
-//       authorization: token,
-//         }
-//        }) .then(handleResponse)
-
-// }
-
-// const createToDo = () => {
-//   return fetch(serverURL, {
-//     method: 'POST',
-//     headers: {
-//       authorization: token,
-//       'Content-type': 'application/json',
-//       },
-//       body: JSON.stringify({
-//         name: name,
-//         link: link,
-//       }),
-//        }) .then(handleResponse)
-// }
-
-// Promise.all([getAllToDos(), createToDo()])
-// .then(([todos, newCard]) => {
-//   console.log(todos, newCard)
-// })
