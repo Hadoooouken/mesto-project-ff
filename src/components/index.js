@@ -121,7 +121,8 @@ function addInitialCards() {
         card,
         handleDeleteCard,
         handleLikeCard,
-        openImageModal
+        openImageModal,
+        userId
       );
       placesList.append(newCard);
     });
@@ -133,41 +134,36 @@ addNewCardForm.addEventListener('submit', function (evt) {
   const formElement = addNewCardModal.querySelector(
     validationConfig.formSelector
   );
-  const card = {
+  const cardData = {
     name: inputName.value,
     link: inputUrl.value,
+    owner: {
+      _id: userId,
+    },
   };
 
-  const newCard = createCard(
-    card,
-    handleDeleteCard,
-    handleLikeCard,
-    openImageModal
-  );
-  fetchAddСardToServer(inputName.value, inputUrl.value);
+  fetchAddСardToServer(inputName.value, inputUrl.value)
+  .then((cardData) => {
+    const newCard = createCard(
+      cardData,
+      handleDeleteCard,
+      handleLikeCard,
+      openImageModal,
+      userId
+    );
+    placesList.prepend(newCard);
+  }); 
+  
   addNewCardForm.reset();
   closeModal(addNewCardModal);
   clearValidation(formElement, validationConfig);
-  placesList.prepend(newCard);
+ 
 });
+
 
 //промисс с юзером и карточками
 const promises = [renderUserData, addInitialCards];
-Promise.all(promises)
-.then((arr) => arr.forEach((res) => res()));
-
-//функция на удаление карточки
-
-//функция на удаление карточки изначальная
-// function deleteCardFromServer(evt) {
-//   const id = evt.target.id;
-//   const card = document.getElementById(id);
-//   fetchDeleteCardFromServer(card.id)
-//   .then(() => {
-//     card.remove();
-//   })
-
-// }
+Promise.all(promises).then((arr) => arr.forEach((res) => res()));
 
 // const handleLikeIconClick = (cardID, likeButton, likesCount) => {
 //   const isLiked = likeButton.classList.contains("card__like-button_is-active"); // смотрим лайкнута ли карточка или нет
@@ -182,8 +178,10 @@ Promise.all(promises)
 // // чтобы у нас имеклись все необходимые данные для вычисления isLiked и т.д., вызываем нашу функцию следующим образом
 
 //  likeButton.addEventListener("click", () =>
-//       onLike(data._id, likeButton, likesCount) // по сколько карточка создается с сервера, в ней должны быть данные name, link, id и прочее. Если их нет - добавь. Удобнее данные карточки передавать объектом, а не по одному.
-//     );
+//       onLike(data._id, likeButton, likesCount) // 
+// по сколько карточка создается с сервера, в ней должны быть данные name, link, id и прочее. 
+// Если их нет - добавь. Удобнее данные карточки передавать объектом, а не по одному.
+// //     );
 
 //с урока писал
 

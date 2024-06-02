@@ -2,9 +2,11 @@ const serverURL = 'https://nomoreparties.co/v1/wff-cohort-14/';
 const token = '87aba88c-73fd-4f0c-8e8e-c85e9a40fa5a';
 export let userId; //id авторизованного пользователя
 
+
+// получить id пользователя
 export const fetchUserId = (id) => {
   userId = id;
-}; // получить id пользователя
+}; 
 
 // запрашиваем данные о пользователе
 export const fetchUserData = () => {
@@ -58,7 +60,7 @@ export const updateUserData = (name, about) => {
         name: name,
         link: link,
       }),
-    }).then((card) => card)
+    }).then((card) => card.json())
   };
   
   
@@ -69,28 +71,28 @@ export const updateUserData = (name, about) => {
       headers: {
         authorization: token
       }
-    })
+    }).then((card) => card.json())
   };
 
   //запрос на постановку лайка
-  const addLike = (cardId) => {
+  export const addLike = (cardId) => {
     return fetch(`${serverURL}cards/likes/${cardId}`, {
       method: 'PUT',
       headers: {
         authorization: token,
         'Content-type': 'application/json'
       }
-    })
+    }).then((card) => card.json())
   }
   
   export const removeLike = (cardId) => {
-    return request(`${serverURL}cards/likes/${cardId}`, {
+    return fetch(`${serverURL}cards/likes/${cardId}`, {
       method: 'DELETE',
       headers: {
         authorization: token,
         'Content-type': 'application/json'
       }
-    })
+    }).then((card) => card.json())
   }
   
   
