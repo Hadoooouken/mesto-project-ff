@@ -9,6 +9,7 @@ export const validationConfig = {
 
 
   const showInputError = (formElement, inputElement, errorMessage) => {
+    console.log(`.${inputElement.id}-error`)
   const errorElement = formElement.querySelector(`.${inputElement.id}-error`);
   inputElement.classList.add(validationConfig.inputErrorClass);
   errorElement.textContent = errorMessage;

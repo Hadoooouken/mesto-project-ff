@@ -54,7 +54,6 @@ export function handleLikeCard(event) {
       });
     } else {
       addLike(id).then((res) => {
-        console.log(res);
         event.target.classList.toggle('card__like-button_is-active');
         cardLikeCount.textContent = res.likes.length;
       });

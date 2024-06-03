@@ -10,14 +10,12 @@ import {
 
 import {
   userId,
-  fetchUserId,
   fetchUserData,
   fetchCards,
   updateUserData,
   fetchAddСardToServer,
-  fetchDeleteCardFromServer,
-  addLike,
-  removeLike,
+  updateAvatar
+
 } from './api.js';
 
 import '/src/index.css';
@@ -32,6 +30,60 @@ const editProfileModal = document.querySelector('.popup_type_edit');
 const editProfileForm = editProfileModal.querySelector('.popup__form');
 const editProfileButton = document.querySelector('.profile__edit-button');
 
+const editProfileAvatarModal = document.querySelector('.popup_type_edit_avatar');
+const editProfileAvatarForm = editProfileAvatarModal.querySelector('.popup__form');
+const editProfileAvatarImage = document.querySelector('.profile__image')
+const profileInput = editProfileAvatarForm.querySelector('.popup__input_type_profile-url')
+console.log(profileInput.value)
+
+editProfileAvatarImage.addEventListener('click', function() {
+  const formElement = editProfileAvatarModal.querySelector(
+    validationConfig.formSelector)
+  clearValidation(formElement, validationConfig)
+  editProfileAvatarForm.reset()
+  openModal(editProfileAvatarModal)
+})
+
+
+
+//не работает завтра проверить
+// editProfileAvatarForm.addEventListener('submit', (updateAvataruser))
+
+
+// function updateAvataruser(evt) {
+//   evt.preventDefault()
+//   const profilePictureUrl = editProfileAvatarImage.style.backgroundImage.value
+//   .then(() => {
+//     updateUserAvatar(profilePictureUrl)
+//       .then(() => {
+//         editProfileAvatarImage.style.backgroundImage = `url('${profilePictureUrl}')`;
+//         closeModal(editProfileAvatarModal);
+        
+//       })
+// })
+// }
+
+
+
+//     })
+//1 вариант
+
+// function updateAvatarr(url) {
+//   editProfileAvatarImage.style.backgroundImage = `url("${url}")`;
+// }
+
+// editProfileAvatarForm.addEventListener('submit', (evt) => {
+//   evt.preventDefault();
+//   const url = profileInput.value;
+//   updateAvatarr(url)
+  
+//   .then ((url) =>
+//     updateAvatar(url))
+//   closeModal(editProfileAvatarModal)
+  
+// });
+
+
 const modalCloseButtons = document.querySelectorAll('.popup__close');
 const nameInput = document.querySelector('.popup__input_type_name');
 const jobInput = document.querySelector('.popup__input_type_description');
@@ -44,6 +96,9 @@ const imageModalCaption = imageModal.querySelector('.popup__caption');
 
 const inputName = addNewCardForm.querySelector('.popup__input_type_card-name');
 const inputUrl = addNewCardForm.querySelector('.popup__input_type_url');
+
+
+
 
 addNewCardButton.addEventListener('click', function () {
   const formElement = addNewCardModal.querySelector(
@@ -58,9 +113,10 @@ editProfileButton.addEventListener('click', function () {
   const formElement = editProfileModal.querySelector(
     validationConfig.formSelector
   );
-  openModal(editProfileModal);
-  fillProfileInputs();
+  ;
+ 
   clearValidation(formElement, validationConfig);
+  openModal(editProfileModal)
 });
 
 editProfileForm.addEventListener('submit', handleProfileFormSubmit);
@@ -71,7 +127,7 @@ modalCloseButtons.forEach(function (button) {
   });
 });
 
-[addNewCardModal, editProfileModal, imageModal].forEach((modal) => {
+[addNewCardModal, editProfileModal, imageModal, editProfileAvatarModal].forEach((modal) => {
   modal.addEventListener('mousedown', function (event) {
     closeModalByClickOnOverlay(event, modal);
   });
@@ -110,9 +166,13 @@ function renderUserData() {
       jobInputCurrent.textContent = res.about;
       editProfileForm.elements['name-input'].value = res.name;
       editProfileForm.elements['description-input'].value = res.about;
+      
+       
     })
     .catch((err) => console.log(err));
 }
+
+ 
 //выводим карточки на страницу
 function addInitialCards() {
   fetchCards().then((res) => {

@@ -94,6 +94,20 @@ export const updateUserData = (name, about) => {
       }
     }).then((card) => card.json())
   }
+
+ // запрос на аватар
+  export const updateAvatar = (url) => {
+    return fetch(`${serverURL}users/me/avatar`, {
+      method: 'PATCH',
+      headers: {
+        authorization: token,
+        'Content-type': 'application/json'
+      },
+      body: JSON.stringify({
+        avatar: url
+      })
+    })
+  }
   
   
   
