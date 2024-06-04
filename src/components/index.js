@@ -8,7 +8,14 @@ import {
   validationConfig,
 } from './validation.js';
 
-import { userId, fetchUserData,fetchCards,updateUserData,fetchAddСardToServer,updateAvatar } from './api.js';
+import {
+  userId,
+  fetchUserData,
+  fetchCards,
+  updateUserData,
+  fetchAddСardToServer,
+  updateAvatar,
+} from './api.js';
 
 import '/src/index.css';
 
@@ -22,10 +29,15 @@ const editProfileModal = document.querySelector('.popup_type_edit');
 const editProfileForm = editProfileModal.querySelector('.popup__form');
 const editProfileButton = document.querySelector('.profile__edit-button');
 
-const editProfileAvatarModal = document.querySelector('.popup_type_edit_avatar');
-const editProfileAvatarForm = editProfileAvatarModal.querySelector('.popup__form');
+const editProfileAvatarModal = document.querySelector(
+  '.popup_type_edit_avatar'
+);
+const editProfileAvatarForm =
+  editProfileAvatarModal.querySelector('.popup__form');
 const editProfileAvatarImage = document.querySelector('.profile__image');
-const profileAvatarinput = editProfileAvatarForm.querySelector('.popup__input_type_profile-url');
+const profileAvatarinput = editProfileAvatarForm.querySelector(
+  '.popup__input_type_profile-url'
+);
 
 const modalCloseButtons = document.querySelectorAll('.popup__close');
 const nameInput = document.querySelector('.popup__input_type_name');
@@ -40,39 +52,36 @@ const imageModalCaption = imageModal.querySelector('.popup__caption');
 const inputName = addNewCardForm.querySelector('.popup__input_type_card-name');
 const inputUrl = addNewCardForm.querySelector('.popup__input_type_url');
 
-
 addNewCardButton.addEventListener('click', () => {
-  const formElement = addNewCardModal.querySelector(validationConfig.formSelector);
+  const formElement = addNewCardModal.querySelector(
+    validationConfig.formSelector
+  );
   clearValidation(formElement, validationConfig);
   addNewCardForm.reset(); //переместил функционал сюда из modalCloseButtons
   openModal(addNewCardModal);
 });
 
-
 editProfileButton.addEventListener('click', () => {
-  const formElement = editProfileModal.querySelector(validationConfig.formSelector);
+  const formElement = editProfileModal.querySelector(
+    validationConfig.formSelector
+  );
   clearValidation(formElement, validationConfig);
   openModal(editProfileModal);
 });
 
 editProfileAvatarForm.addEventListener('submit', updateProfileAvatarSubmit);
 
-
 editProfileForm.addEventListener('submit', handleProfileFormSubmit);
-
 
 fillProfileInputs();
 
-
 enableValidation(validationConfig);
-
 
 modalCloseButtons.forEach(function (button) {
   button.addEventListener('click', function () {
     closeModal(button.closest('.popup'));
   });
 });
-
 
 [addNewCardModal, editProfileModal, imageModal, editProfileAvatarModal].forEach(
   (modal) => {
@@ -82,25 +91,23 @@ modalCloseButtons.forEach(function (button) {
   }
 );
 
-
 function handleProfileFormSubmit(evt) {
   evt.preventDefault();
   nameInputCurrent.textContent = nameInput.value;
   jobInputCurrent.textContent = jobInput.value;
-  addPreloader(evt)
-  updateUserData(nameInput.value, jobInput.value).finally(() =>
-    closeModal(editProfileModal)
-  ).finally(() => {
-    removePreloader(evt)
-  })
+  addPreloader(evt);
+  updateUserData(nameInput.value, jobInput.value)
+    .finally(() => closeModal(editProfileModal))
+    .catch((err) => console.log(err))
+    .finally(() => {
+      removePreloader(evt);
+    });
 }
-
 
 function fillProfileInputs() {
   nameInput.value = nameInputCurrent.textContent;
   jobInput.value = jobInputCurrent.textContent;
 }
-
 
 function openImageModal(card) {
   imageModalImage.src = card.link;
@@ -108,7 +115,6 @@ function openImageModal(card) {
   imageModalCaption.textContent = card.name;
   openModal(imageModal);
 }
-
 
 // функция, отображающая данные пользователя на странице
 function renderUserData() {
@@ -125,18 +131,22 @@ function renderUserData() {
 
 //выводим карточки на страницу
 function addInitialCards() {
-  fetchCards().then((res) => {
-    res.forEach(function (card) {
-      const newCard = createCard(
-        card,
-        handleDeleteCard,
-        handleLikeCard,
-        openImageModal,
-        userId
-      );
-      placesList.append(newCard);
+  fetchCards()
+    .then((res) => {
+      res.forEach(function (card) {
+        const newCard = createCard(
+          card,
+          handleDeleteCard,
+          handleLikeCard,
+          openImageModal,
+          userId
+        );
+        placesList.append(newCard);
+      });
+    })
+    .catch((err) => {
+      console.log(err);
     });
-  });
 }
 
 addNewCardForm.addEventListener('submit', function (evt) {
@@ -152,59 +162,67 @@ addNewCardForm.addEventListener('submit', function (evt) {
     },
   };
 
-  addPreloader(evt)
+  addPreloader(evt);
   fetchAddСardToServer(inputName.value, inputUrl.value)
-  .then((cardData) => {
-   
-    const newCard = createCard(
-      cardData,
-      handleDeleteCard,
-      handleLikeCard,
-      openImageModal,
-      userId
-    );
-    placesList.prepend(newCard);
-  }).finally(() => {
-    removePreloader(evt)
-  })
+    .then((cardData) => {
+      const newCard = createCard(
+        cardData,
+        handleDeleteCard,
+        handleLikeCard,
+        openImageModal,
+        userId
+      );
+      placesList.prepend(newCard);
+    })
+    .catch((err) => console.log(err))
+    .finally(() => {
+      removePreloader(evt);
+    });
 
   addNewCardForm.reset();
   closeModal(addNewCardModal);
-  clearValidation(formElement, validationConfig)
+  clearValidation(formElement, validationConfig);
 });
-
 
 editProfileAvatarImage.addEventListener('click', () => {
-  const formElement = editProfileAvatarModal.querySelector(validationConfig.formSelector);
+  const formElement = editProfileAvatarModal.querySelector(
+    validationConfig.formSelector
+  );
 
-  editProfileAvatarForm.reset()
+  editProfileAvatarForm.reset();
   openModal(editProfileAvatarModal);
-  
 });
-
 
 function updateProfileAvatarSubmit(evt) {
   evt.preventDefault();
-  const formElement = editProfileAvatarModal.querySelector(validationConfig.formSelector);
+  const formElement = editProfileAvatarModal.querySelector(
+    validationConfig.formSelector
+  );
   const profilePictureUrl = profileAvatarinput.value;
-  addPreloader(evt)
+  addPreloader(evt);
   updateAvatar(profilePictureUrl)
-  .then(() => {
-    editProfileAvatarImage.style['background-image'] = `url('${profilePictureUrl}')`;
-    closeModal(editProfileAvatarModal);
-    clearValidation(formElement, validationConfig);
+    .then(() => {
+      editProfileAvatarImage.style[
+        'background-image'
+      ] = `url('${profilePictureUrl}')`;
+      closeModal(editProfileAvatarModal);
+      clearValidation(formElement, validationConfig);
     })
+    .catch((err) => {
+      console.log(err);
+    })
+    .catch((err) => console.log(err))
     .finally(() => {
-      removePreloader(evt)
-    })
+      removePreloader(evt);
+    });
 }
 
-function addPreloader (evt) {
-  evt.submitter.textContent = 'Сохранение...'
+function addPreloader(evt) {
+  evt.submitter.textContent = 'Сохранение...';
 }
 
-function removePreloader (evt) {
-  evt.submitter.textContent = 'Сохранить'
+function removePreloader(evt) {
+  evt.submitter.textContent = 'Сохранить';
 }
 
 //промисс с юзером и карточками

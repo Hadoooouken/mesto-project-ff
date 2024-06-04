@@ -2,18 +2,9 @@ const serverURL = 'https://nomoreparties.co/v1/wff-cohort-14/';
 const token = '87aba88c-73fd-4f0c-8e8e-c85e9a40fa5a';
 export let userId;
 
-// const handleResponse = (res) => {
-//   if(res.ok) {
-//     return res.json()
-//   }
-// }
-
-
-
 export const fetchUserId = (id) => {
   userId = id;
 };
-
 
 export const fetchUserData = () => {
   return fetch(`${serverURL}users/me`, {
@@ -22,13 +13,12 @@ export const fetchUserData = () => {
       authorization: token,
     },
   })
-    .then((res) => res.json())
+    .then(handleResponse)
     .then((res) => {
       fetchUserId(res['_id']);
       return res;
     });
 };
-
 
 export const fetchCards = () => {
   return fetch(`${serverURL}cards`, {
@@ -36,9 +26,8 @@ export const fetchCards = () => {
     headers: {
       authorization: token,
     },
-  }).then((res) => res.json());
+  }).then(handleResponse);
 };
-
 
 export const updateUserData = (name, about) => {
   return fetch(`${serverURL}users/me`, {
@@ -51,9 +40,8 @@ export const updateUserData = (name, about) => {
       name: name,
       about: about,
     }),
-  });
+  }).then(handleResponse);
 };
-
 
 export const fetchAddСardToServer = (name, link) => {
   return fetch(`${serverURL}cards`, {
@@ -66,9 +54,8 @@ export const fetchAddСardToServer = (name, link) => {
       name: name,
       link: link,
     }),
-  }).then((card) => card.json());
+  }).then(handleResponse);
 };
-
 
 export const fetchDeleteCardFromServer = (cardId) => {
   return fetch(`${serverURL}cards/${cardId}`, {
@@ -76,9 +63,8 @@ export const fetchDeleteCardFromServer = (cardId) => {
     headers: {
       authorization: token,
     },
-  }).then((card) => card.json());
+  }).then(handleResponse);
 };
-
 
 export const addLike = (cardId) => {
   return fetch(`${serverURL}cards/likes/${cardId}`, {
@@ -87,7 +73,7 @@ export const addLike = (cardId) => {
       authorization: token,
       'Content-type': 'application/json',
     },
-  }).then((card) => card.json());
+  }).then(handleResponse);
 };
 
 export const removeLike = (cardId) => {
@@ -97,9 +83,8 @@ export const removeLike = (cardId) => {
       authorization: token,
       'Content-type': 'application/json',
     },
-  }).then((card) => card.json());
+  }).then(handleResponse);
 };
-
 
 export const updateAvatar = (url) => {
   return fetch(`${serverURL}users/me/avatar`, {
@@ -111,5 +96,12 @@ export const updateAvatar = (url) => {
     body: JSON.stringify({
       avatar: url,
     }),
-  });
+  }).then(handleResponse);
+};
+
+const handleResponse = (res) => {
+  if (res.ok) {
+    return res.json();
+  }
+  return Promise.reject(`Что-то пошло не так: ${res.status}`);
 };

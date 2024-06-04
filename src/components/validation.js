@@ -1,10 +1,10 @@
 export const validationConfig = {
-  formSelector: '.popup__form', 
-  inputSelector: '.popup__input', 
-  submitButtonSelector: '.popup__button', 
-  inactiveButtonClass: 'popup__button_disabled', 
-  inputErrorClass: 'popup__input_type_error', 
-  errorClass: 'popup__error_visible', 
+  formSelector: '.popup__form',
+  inputSelector: '.popup__input',
+  submitButtonSelector: '.popup__button',
+  inactiveButtonClass: 'popup__button_disabled',
+  inputErrorClass: 'popup__input_type_error',
+  errorClass: 'popup__error_visible',
 };
 
 const showInputError = (formElement, inputElement, errorMessage) => {
@@ -35,8 +35,12 @@ const checkInputValidity = (formElement, inputElement) => {
 };
 
 const setEventListeners = (formElement) => {
-  const inputList = Array.from( formElement.querySelectorAll(validationConfig.inputSelector));
-  const buttonElement = formElement.querySelector(validationConfig.submitButtonSelector );
+  const inputList = Array.from(
+    formElement.querySelectorAll(validationConfig.inputSelector)
+  );
+  const buttonElement = formElement.querySelector(
+    validationConfig.submitButtonSelector
+  );
   toggleButtonState(inputList, buttonElement);
   inputList.forEach((inputElement) => {
     inputElement.addEventListener('input', function () {
@@ -55,11 +59,8 @@ export function enableValidation() {
       evt.preventDefault();
     });
     setEventListeners(formElement);
-  
   });
 }
-
-
 
 function hasInvalidInput(inputList) {
   return inputList.some((inputElement) => {
@@ -77,17 +78,17 @@ function toggleButtonState(inputList, buttonElement) {
   }
 }
 
-
-export function clearValidation (formElement, validationConfig) {
-  const submitButton = formElement.querySelector(validationConfig.submitButtonSelector)
-  submitButton.disabled = true
+export function clearValidation(formElement, validationConfig) {
+  const submitButton = formElement.querySelector(
+    validationConfig.submitButtonSelector
+  );
+  submitButton.disabled = true;
   submitButton.classList.add(validationConfig.inactiveButtonClass);
-  
-  const inputElements = formElement.querySelectorAll(validationConfig.inputSelector)
+
+  const inputElements = formElement.querySelectorAll(
+    validationConfig.inputSelector
+  );
   inputElements.forEach((input) => {
-    hideInputError(formElement, input)
-    
-  })
-
+    hideInputError(formElement, input);
+  });
 }
-
