@@ -1,15 +1,13 @@
 export const validationConfig = {
-  formSelector: '.popup__form', //класс для форм
-  inputSelector: '.popup__input', //класс для инпутов
-  submitButtonSelector: '.popup__button', //класс для кнопок
-  inactiveButtonClass: 'popup__button_disabled', //класс для выключения кнопки
-  inputErrorClass: 'popup__input_type_error', //нижнее подчеркивание поля инпута горит красным при ошибке
-  errorClass: 'popup__error_visible', //дисплей блок видим ошибку, цвет красный
+  formSelector: '.popup__form', 
+  inputSelector: '.popup__input', 
+  submitButtonSelector: '.popup__button', 
+  inactiveButtonClass: 'popup__button_disabled', 
+  inputErrorClass: 'popup__input_type_error', 
+  errorClass: 'popup__error_visible', 
 };
 
-
-  const showInputError = (formElement, inputElement, errorMessage) => {
-    console.log(`.${inputElement.id}-error`)
+const showInputError = (formElement, inputElement, errorMessage) => {
   const errorElement = formElement.querySelector(`.${inputElement.id}-error`);
   inputElement.classList.add(validationConfig.inputErrorClass);
   errorElement.textContent = errorMessage;

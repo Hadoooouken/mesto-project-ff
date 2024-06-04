@@ -8,15 +8,7 @@ import {
   validationConfig,
 } from './validation.js';
 
-import {
-  userId,
-  fetchUserData,
-  fetchCards,
-  updateUserData,
-  fetchAddСardToServer,
-  updateAvatar
-
-} from './api.js';
+import { userId, fetchUserData,fetchCards,updateUserData,fetchAddСardToServer,updateAvatar } from './api.js';
 
 import '/src/index.css';
 
@@ -32,57 +24,8 @@ const editProfileButton = document.querySelector('.profile__edit-button');
 
 const editProfileAvatarModal = document.querySelector('.popup_type_edit_avatar');
 const editProfileAvatarForm = editProfileAvatarModal.querySelector('.popup__form');
-const editProfileAvatarImage = document.querySelector('.profile__image')
-const profileInput = editProfileAvatarForm.querySelector('.popup__input_type_profile-url')
-console.log(profileInput.value)
-
-editProfileAvatarImage.addEventListener('click', function() {
-  const formElement = editProfileAvatarModal.querySelector(
-    validationConfig.formSelector)
-  clearValidation(formElement, validationConfig)
-  editProfileAvatarForm.reset()
-  openModal(editProfileAvatarModal)
-})
-
-
-
-//не работает завтра проверить
-// editProfileAvatarForm.addEventListener('submit', (updateAvataruser))
-
-
-// function updateAvataruser(evt) {
-//   evt.preventDefault()
-//   const profilePictureUrl = editProfileAvatarImage.style.backgroundImage.value
-//   .then(() => {
-//     updateUserAvatar(profilePictureUrl)
-//       .then(() => {
-//         editProfileAvatarImage.style.backgroundImage = `url('${profilePictureUrl}')`;
-//         closeModal(editProfileAvatarModal);
-        
-//       })
-// })
-// }
-
-
-
-//     })
-//1 вариант
-
-// function updateAvatarr(url) {
-//   editProfileAvatarImage.style.backgroundImage = `url("${url}")`;
-// }
-
-// editProfileAvatarForm.addEventListener('submit', (evt) => {
-//   evt.preventDefault();
-//   const url = profileInput.value;
-//   updateAvatarr(url)
-  
-//   .then ((url) =>
-//     updateAvatar(url))
-//   closeModal(editProfileAvatarModal)
-  
-// });
-
+const editProfileAvatarImage = document.querySelector('.profile__image');
+const profileAvatarinput = editProfileAvatarForm.querySelector('.popup__input_type_profile-url');
 
 const modalCloseButtons = document.querySelectorAll('.popup__close');
 const nameInput = document.querySelector('.popup__input_type_name');
@@ -98,28 +41,31 @@ const inputName = addNewCardForm.querySelector('.popup__input_type_card-name');
 const inputUrl = addNewCardForm.querySelector('.popup__input_type_url');
 
 
-
-
-addNewCardButton.addEventListener('click', function () {
-  const formElement = addNewCardModal.querySelector(
-    validationConfig.formSelector
-  );
+addNewCardButton.addEventListener('click', () => {
+  const formElement = addNewCardModal.querySelector(validationConfig.formSelector);
   clearValidation(formElement, validationConfig);
   addNewCardForm.reset(); //переместил функционал сюда из modalCloseButtons
   openModal(addNewCardModal);
 });
 
-editProfileButton.addEventListener('click', function () {
-  const formElement = editProfileModal.querySelector(
-    validationConfig.formSelector
-  );
-  ;
- 
+
+editProfileButton.addEventListener('click', () => {
+  const formElement = editProfileModal.querySelector(validationConfig.formSelector);
   clearValidation(formElement, validationConfig);
-  openModal(editProfileModal)
+  openModal(editProfileModal);
 });
 
+editProfileAvatarForm.addEventListener('submit', updateProfileAvatarSubmit);
+
+
 editProfileForm.addEventListener('submit', handleProfileFormSubmit);
+
+
+fillProfileInputs();
+
+
+enableValidation(validationConfig);
+
 
 modalCloseButtons.forEach(function (button) {
   button.addEventListener('click', function () {
@@ -127,29 +73,34 @@ modalCloseButtons.forEach(function (button) {
   });
 });
 
-[addNewCardModal, editProfileModal, imageModal, editProfileAvatarModal].forEach((modal) => {
-  modal.addEventListener('mousedown', function (event) {
-    closeModalByClickOnOverlay(event, modal);
-  });
-});
 
-fillProfileInputs();
+[addNewCardModal, editProfileModal, imageModal, editProfileAvatarModal].forEach(
+  (modal) => {
+    modal.addEventListener('mousedown', function (event) {
+      closeModalByClickOnOverlay(event, modal);
+    });
+  }
+);
 
-enableValidation(validationConfig);
 
 function handleProfileFormSubmit(evt) {
   evt.preventDefault();
   nameInputCurrent.textContent = nameInput.value;
   jobInputCurrent.textContent = jobInput.value;
+  addPreloader(evt)
   updateUserData(nameInput.value, jobInput.value).finally(() =>
     closeModal(editProfileModal)
-  );
+  ).finally(() => {
+    removePreloader(evt)
+  })
 }
+
 
 function fillProfileInputs() {
   nameInput.value = nameInputCurrent.textContent;
   jobInput.value = jobInputCurrent.textContent;
 }
+
 
 function openImageModal(card) {
   imageModalImage.src = card.link;
@@ -157,6 +108,7 @@ function openImageModal(card) {
   imageModalCaption.textContent = card.name;
   openModal(imageModal);
 }
+
 
 // функция, отображающая данные пользователя на странице
 function renderUserData() {
@@ -166,13 +118,11 @@ function renderUserData() {
       jobInputCurrent.textContent = res.about;
       editProfileForm.elements['name-input'].value = res.name;
       editProfileForm.elements['description-input'].value = res.about;
-      
-       
+      editProfileAvatarImage.style['background-image'] = `url('${res.avatar}')`;
     })
     .catch((err) => console.log(err));
 }
 
- 
 //выводим карточки на страницу
 function addInitialCards() {
   fetchCards().then((res) => {
@@ -202,8 +152,10 @@ addNewCardForm.addEventListener('submit', function (evt) {
     },
   };
 
+  addPreloader(evt)
   fetchAddСardToServer(inputName.value, inputUrl.value)
   .then((cardData) => {
+   
     const newCard = createCard(
       cardData,
       handleDeleteCard,
@@ -212,41 +164,49 @@ addNewCardForm.addEventListener('submit', function (evt) {
       userId
     );
     placesList.prepend(newCard);
-  }); 
-  
+  }).finally(() => {
+    removePreloader(evt)
+  })
+
   addNewCardForm.reset();
   closeModal(addNewCardModal);
-  clearValidation(formElement, validationConfig);
- 
+  clearValidation(formElement, validationConfig)
 });
 
+
+editProfileAvatarImage.addEventListener('click', () => {
+  const formElement = editProfileAvatarModal.querySelector(validationConfig.formSelector);
+
+  editProfileAvatarForm.reset()
+  openModal(editProfileAvatarModal);
+  
+});
+
+
+function updateProfileAvatarSubmit(evt) {
+  evt.preventDefault();
+  const formElement = editProfileAvatarModal.querySelector(validationConfig.formSelector);
+  const profilePictureUrl = profileAvatarinput.value;
+  addPreloader(evt)
+  updateAvatar(profilePictureUrl)
+  .then(() => {
+    editProfileAvatarImage.style['background-image'] = `url('${profilePictureUrl}')`;
+    closeModal(editProfileAvatarModal);
+    clearValidation(formElement, validationConfig);
+    })
+    .finally(() => {
+      removePreloader(evt)
+    })
+}
+
+function addPreloader (evt) {
+  evt.submitter.textContent = 'Сохранение...'
+}
+
+function removePreloader (evt) {
+  evt.submitter.textContent = 'Сохранить'
+}
 
 //промисс с юзером и карточками
 const promises = [renderUserData, addInitialCards];
 Promise.all(promises).then((arr) => arr.forEach((res) => res()));
-
-// const handleLikeIconClick = (cardID, likeButton, likesCount) => {
-//   const isLiked = likeButton.classList.contains("card__like-button_is-active"); // смотрим лайкнута ли карточка или нет
-//   функцияЗапросаЛайка(cardID, !isLiked) // можно объединить в одну, и на основе isLiked понимать лайк или снятие лайка
-//     .then((cardData) => {
-//        // переключаем лайкнутость
-// // изменяем количество лайков исходя из длины массива
-//     })
-//     .catch((err) => (...));
-// };
-
-// // чтобы у нас имеклись все необходимые данные для вычисления isLiked и т.д., вызываем нашу функцию следующим образом
-
-//  likeButton.addEventListener("click", () =>
-//       onLike(data._id, likeButton, likesCount) // 
-// по сколько карточка создается с сервера, в ней должны быть данные name, link, id и прочее. 
-// Если их нет - добавь. Удобнее данные карточки передавать объектом, а не по одному.
-// //     );
-
-//с урока писал
-
-// const handleResponse = (res) => {
-//   if(res.ok) {
-//     return res.json()
-//   }
-// }
