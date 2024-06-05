@@ -103,10 +103,12 @@ function handleProfileFormSubmit(evt) {
     .then((res) => {
       nameInputCurrent.textContent = res.name;
       jobInputCurrent.textContent = res.about;
-      closeModal(editProfileModal);
     })
     .catch((err) => console.log(err))
-    .finally(() => removePreloader(evt));
+    .finally(() => {
+      removePreloader(evt);
+      closeModal(editProfileModal);
+    });
 }
 
 function fillProfileInputs() {
