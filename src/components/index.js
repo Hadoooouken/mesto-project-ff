@@ -15,7 +15,7 @@ import {
 
 import '/src/index.css';
 
-export const validationConfig = {
+const validationConfig = {
   formSelector: '.popup__form',
   inputSelector: '.popup__input',
   submitButtonSelector: '.popup__button',
@@ -23,6 +23,7 @@ export const validationConfig = {
   inputErrorClass: 'popup__input_type_error',
   errorClass: 'popup__error_visible',
 };
+
 
 const placesList = document.querySelector('.places__list');
 
@@ -127,7 +128,9 @@ function renderUserData(userInfo) {
   jobInputCurrent.textContent = userInfo.about;
   editProfileForm.elements['name-input'].value = userInfo.name;
   editProfileForm.elements['description-input'].value = userInfo.about;
-  editProfileAvatarImage.style['background-image'] = `url('${userInfo.avatar}')`;
+  editProfileAvatarImage.style[
+    'background-image'
+  ] = `url('${userInfo.avatar}')`;
 }
 
 //выводим карточки на страницу
@@ -180,19 +183,12 @@ addNewCardForm.addEventListener('submit', (evt) => {
 });
 
 editProfileAvatarImage.addEventListener('click', () => {
-  const formElement = editProfileAvatarModal.querySelector(
-    validationConfig.formSelector
-  );
-
   editProfileAvatarForm.reset();
   openModal(editProfileAvatarModal);
 });
 
 function updateProfileAvatarSubmit(evt) {
   evt.preventDefault();
-  const formElement = editProfileAvatarModal.querySelector(
-    validationConfig.formSelector
-  );
   const url = profileAvatarinput.value;
   addPreloader(evt);
   updateAvatar(url)
@@ -221,7 +217,9 @@ function removePreloader(evt) {
 }
 
 const promises = [fetchUserData(), fetchCards()];
-Promise.all(promises).then(([userInfo, cards]) => {
-  renderUserData(userInfo);
-  addInitialCards(cards);
-}).catch((err) => console.log(err))
+Promise.all(promises)
+  .then(([userInfo, cards]) => {
+    renderUserData(userInfo);
+    addInitialCards(cards);
+  })
+  .catch((err) => console.log(err));
