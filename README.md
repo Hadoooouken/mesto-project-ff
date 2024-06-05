@@ -1,2 +1,2 @@
 # Проектная работа Mesto
-https://github.com/Hadoooouken/mesto-project-ff.git
+https://hadoooouken.github.io/mesto-project-ff/
