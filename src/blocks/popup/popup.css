@@ -21,3 +21,8 @@
   right: 0;
   z-index: 10;
 }
+
+.popup_type_edit_avatar_content {
+  min-height: 272px;
+
+} 

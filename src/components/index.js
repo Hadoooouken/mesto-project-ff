@@ -1,12 +1,8 @@
-import { createCard, handleLikeCard, handleDeleteCard } from './cards.js';
+import { createCard, handleLikeCard, handleDeleteCard } from './card.js';
 
 import { openModal, closeModal, closeModalByClickOnOverlay } from './modal.js';
 
-import {
-  enableValidation,
-  clearValidation,
-  validationConfig,
-} from './validation.js';
+import { enableValidation, clearValidation } from './validation.js';
 
 import {
   userId,
@@ -18,6 +14,15 @@ import {
 } from './api.js';
 
 import '/src/index.css';
+
+export const validationConfig = {
+  formSelector: '.popup__form',
+  inputSelector: '.popup__input',
+  submitButtonSelector: '.popup__button',
+  inactiveButtonClass: 'popup__button_disabled',
+  inputErrorClass: 'popup__input_type_error',
+  errorClass: 'popup__error_visible',
+};
 
 const placesList = document.querySelector('.places__list');
 
@@ -57,7 +62,7 @@ addNewCardButton.addEventListener('click', () => {
     validationConfig.formSelector
   );
   clearValidation(formElement, validationConfig);
-  addNewCardForm.reset(); //переместил функционал сюда из modalCloseButtons
+  addNewCardForm.reset();
   openModal(addNewCardModal);
 });
 
@@ -66,6 +71,7 @@ editProfileButton.addEventListener('click', () => {
     validationConfig.formSelector
   );
   clearValidation(formElement, validationConfig);
+  fillProfileInputs();
   openModal(editProfileModal);
 });
 
@@ -77,31 +83,30 @@ fillProfileInputs();
 
 enableValidation(validationConfig);
 
-modalCloseButtons.forEach(function (button) {
-  button.addEventListener('click', function () {
+modalCloseButtons.forEach((button) => {
+  button.addEventListener('click', () => {
     closeModal(button.closest('.popup'));
   });
 });
 
 [addNewCardModal, editProfileModal, imageModal, editProfileAvatarModal].forEach(
   (modal) => {
-    modal.addEventListener('mousedown', function (event) {
+    modal.addEventListener('mousedown', (event) => {
       closeModalByClickOnOverlay(event, modal);
     });
   }
 );
-
 function handleProfileFormSubmit(evt) {
   evt.preventDefault();
-  nameInputCurrent.textContent = nameInput.value;
-  jobInputCurrent.textContent = jobInput.value;
   addPreloader(evt);
   updateUserData(nameInput.value, jobInput.value)
-    .finally(() => closeModal(editProfileModal))
+    .then((res) => {
+      nameInputCurrent.textContent = res.name;
+      jobInputCurrent.textContent = res.about;
+      closeModal(editProfileModal);
+    })
     .catch((err) => console.log(err))
-    .finally(() => {
-      removePreloader(evt);
-    });
+    .finally(() => removePreloader(evt));
 }
 
 function fillProfileInputs() {
@@ -117,39 +122,29 @@ function openImageModal(card) {
 }
 
 // функция, отображающая данные пользователя на странице
-function renderUserData() {
-  fetchUserData()
-    .then((res) => {
-      nameInputCurrent.textContent = res.name;
-      jobInputCurrent.textContent = res.about;
-      editProfileForm.elements['name-input'].value = res.name;
-      editProfileForm.elements['description-input'].value = res.about;
-      editProfileAvatarImage.style['background-image'] = `url('${res.avatar}')`;
-    })
-    .catch((err) => console.log(err));
+function renderUserData(userInfo) {
+  nameInputCurrent.textContent = userInfo.name;
+  jobInputCurrent.textContent = userInfo.about;
+  editProfileForm.elements['name-input'].value = userInfo.name;
+  editProfileForm.elements['description-input'].value = userInfo.about;
+  editProfileAvatarImage.style['background-image'] = `url('${userInfo.avatar}')`;
 }
 
 //выводим карточки на страницу
-function addInitialCards() {
-  fetchCards()
-    .then((res) => {
-      res.forEach(function (card) {
-        const newCard = createCard(
-          card,
-          handleDeleteCard,
-          handleLikeCard,
-          openImageModal,
-          userId
-        );
-        placesList.append(newCard);
-      });
-    })
-    .catch((err) => {
-      console.log(err);
-    });
+function addInitialCards(cards) {
+  cards.forEach((card) => {
+    const newCard = createCard(
+      card,
+      handleDeleteCard,
+      handleLikeCard,
+      openImageModal,
+      userId
+    );
+    placesList.append(newCard);
+  });
 }
 
-addNewCardForm.addEventListener('submit', function (evt) {
+addNewCardForm.addEventListener('submit', (evt) => {
   evt.preventDefault();
   const formElement = addNewCardModal.querySelector(
     validationConfig.formSelector
@@ -198,10 +193,11 @@ function updateProfileAvatarSubmit(evt) {
   const formElement = editProfileAvatarModal.querySelector(
     validationConfig.formSelector
   );
-  const profilePictureUrl = profileAvatarinput.value;
+  const url = profileAvatarinput.value;
   addPreloader(evt);
-  updateAvatar(profilePictureUrl)
-    .then(() => {
+  updateAvatar(url)
+    .then((res) => {
+      const profilePictureUrl = res.avatar;
       editProfileAvatarImage.style[
         'background-image'
       ] = `url('${profilePictureUrl}')`;
@@ -211,7 +207,6 @@ function updateProfileAvatarSubmit(evt) {
     .catch((err) => {
       console.log(err);
     })
-    .catch((err) => console.log(err))
     .finally(() => {
       removePreloader(evt);
     });
@@ -225,6 +220,8 @@ function removePreloader(evt) {
   evt.submitter.textContent = 'Сохранить';
 }
 
-//промисс с юзером и карточками
-const promises = [renderUserData, addInitialCards];
-Promise.all(promises).then((arr) => arr.forEach((res) => res()));
+const promises = [fetchUserData(), fetchCards()];
+Promise.all(promises).then(([userInfo, cards]) => {
+  renderUserData(userInfo);
+  addInitialCards(cards);
+}).catch((err) => console.log(err))

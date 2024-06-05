@@ -2,7 +2,7 @@ const serverURL = 'https://nomoreparties.co/v1/wff-cohort-14/';
 const token = '87aba88c-73fd-4f0c-8e8e-c85e9a40fa5a';
 export let userId;
 
-export const fetchUserId = (id) => {
+export const setUserId = (id) => {
   userId = id;
 };
 
@@ -15,7 +15,7 @@ export const fetchUserData = () => {
   })
     .then(handleResponse)
     .then((res) => {
-      fetchUserId(res['_id']);
+      setUserId(res['_id']);
       return res;
     });
 };
