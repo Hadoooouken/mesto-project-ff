@@ -24,7 +24,6 @@ const validationConfig = {
   errorClass: 'popup__error_visible',
 };
 
-
 const placesList = document.querySelector('.places__list');
 
 const addNewCardModal = document.querySelector('.popup_type_new-card');
@@ -175,20 +174,26 @@ addNewCardForm.addEventListener('submit', (evt) => {
     .catch((err) => console.log(err))
     .finally(() => {
       removePreloader(evt);
+      closeModal(addNewCardModal);
+      clearValidation(formElement, validationConfig);
+      addNewCardForm.reset();
     });
-
-  addNewCardForm.reset();
-  closeModal(addNewCardModal);
-  clearValidation(formElement, validationConfig);
 });
 
 editProfileAvatarImage.addEventListener('click', () => {
+  const formElement = editProfileAvatarModal.querySelector(
+    validationConfig.formSelector
+  );
+  clearValidation(formElement, validationConfig);
   editProfileAvatarForm.reset();
   openModal(editProfileAvatarModal);
 });
 
 function updateProfileAvatarSubmit(evt) {
   evt.preventDefault();
+  const formElement = editProfileAvatarModal.querySelector(
+    validationConfig.formSelector
+  );
   const url = profileAvatarinput.value;
   addPreloader(evt);
   updateAvatar(url)
@@ -197,14 +202,15 @@ function updateProfileAvatarSubmit(evt) {
       editProfileAvatarImage.style[
         'background-image'
       ] = `url('${profilePictureUrl}')`;
-      closeModal(editProfileAvatarModal);
-      clearValidation(formElement, validationConfig);
     })
     .catch((err) => {
       console.log(err);
     })
     .finally(() => {
       removePreloader(evt);
+      closeModal(editProfileAvatarModal);
+      clearValidation(formElement, validationConfig);
+      editProfileAvatarForm.reset();
     });
 }
 
