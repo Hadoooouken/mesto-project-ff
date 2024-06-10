@@ -107,3 +107,50 @@ const handleResponse = (res) => {
   return Promise.reject(`Что-то пошло не так: ${res.status}`);
 };
 
+
+// export function checkImageUrl(url) {
+//   return fetch(url, { method: 'HEAD' })
+//     .then(response => {
+//       const contentType = response.headers.get('Content-Type');
+//       if (response.ok && contentType && contentType.includes('image')) {
+//         return { isValid: true, contentType };
+//       } else {
+//         return { isValid: false };
+//       }
+//     })
+//     .catch(error => {
+//       console.error('Ошибка при запросе URL:', error);
+//       return { isValid: false };
+//     });
+// }
+
+// function updateProfileAvatarSubmit(evt) {
+//   evt.preventDefault();
+//   const formElement = editProfileAvatarModal.querySelector(validationConfig.formSelector);
+//   const url = profileAvatarinput.value;
+//   addPreloader(evt);
+
+
+//   checkImageUrl(url)
+//     .then((imageCheckResult) => {
+//       if (imageCheckResult.isValid) {
+//         // Если URL действителен, обновляем аватар
+//         return updateAvatar(url);
+//       } else {
+//         throw new Error('URL не является действительным изображением');
+//       }
+//     })
+//     .then((res) => {
+//       const profilePictureUrl = res.avatar;
+//       editProfileAvatarImage.style['background-image'] = `url('${profilePictureUrl}')`;
+//     })
+//     .catch((err) => {
+//       console.log(err);
+//     })
+//     .finally(() => {
+//       removePreloader(evt);
+//       closeModal(editProfileAvatarModal);
+//       clearValidation(formElement, validationConfig);
+//       editProfileAvatarForm.reset();
+//     });
+// }

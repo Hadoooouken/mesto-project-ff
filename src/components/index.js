@@ -11,7 +11,8 @@ import {
   updateUserData,
   fetchAddСardToServer,
   updateAvatar,
-  fetchDeleteCardFromServer
+  fetchDeleteCardFromServer,
+  checkImageUrl
 } from './api.js';
 
 import '/src/index.css';
@@ -208,19 +209,16 @@ addNewCardForm.addEventListener('submit', (evt) => {
 });
 
 editProfileAvatarImage.addEventListener('click', () => {
-  const formElement = editProfileAvatarModal.querySelector(
-    validationConfig.formSelector
-  );
+  const formElement = editProfileAvatarModal.querySelector(validationConfig.formSelector);
   clearValidation(formElement, validationConfig);
   editProfileAvatarForm.reset();
   openModal(editProfileAvatarModal);
 });
 
+
 function updateProfileAvatarSubmit(evt) {
   evt.preventDefault();
-  const formElement = editProfileAvatarModal.querySelector(
-    validationConfig.formSelector
-  );
+  const formElement = editProfileAvatarModal.querySelector(validationConfig.formSelector);
   const url = profileAvatarinput.value;
   addPreloader(evt);
   updateAvatar(url)
