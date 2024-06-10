@@ -20,13 +20,15 @@
   width: 100%;
   height: 100%;
   z-index: 1;
-  opacity: 0
+  opacity: 0;
+  background-repeat: no-repeat;
+  background-position: center;
+  transition: opacity 0.5s;
 }
 
 .profile__image:hover::before{
   opacity: 1;
-  background-repeat: no-repeat;
-  background-position: center;
+ 
 }
 
 .profile__image::after {
@@ -38,6 +40,7 @@
   height: 100%;
   background-color: rgba(0,0,0,1);
   opacity: 0;
+  transition: opacity 0.5s;
 }
 
 .profile__image:hover::after{

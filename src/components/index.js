@@ -1,4 +1,4 @@
-import { createCard, handleLikeCard, handleDeleteCard } from './card.js';
+import { createCard, handleLikeCard } from './card.js';
 
 import { openModal, closeModal, closeModalByClickOnOverlay } from './modal.js';
 
@@ -11,6 +11,7 @@ import {
   updateUserData,
   fetchAddСardToServer,
   updateAvatar,
+  fetchDeleteCardFromServer
 } from './api.js';
 
 import '/src/index.css';
@@ -25,6 +26,7 @@ const validationConfig = {
 };
 
 const placesList = document.querySelector('.places__list');
+const allModals = document.querySelectorAll('.popup')
 
 const addNewCardModal = document.querySelector('.popup_type_new-card');
 const addNewCardForm = addNewCardModal.querySelector('.popup__form');
@@ -34,15 +36,14 @@ const editProfileModal = document.querySelector('.popup_type_edit');
 const editProfileForm = editProfileModal.querySelector('.popup__form');
 const editProfileButton = document.querySelector('.profile__edit-button');
 
-const editProfileAvatarModal = document.querySelector(
-  '.popup_type_edit_avatar'
-);
-const editProfileAvatarForm =
-  editProfileAvatarModal.querySelector('.popup__form');
+const editProfileAvatarModal = document.querySelector('.popup_type_edit_avatar');
+const editProfileAvatarForm = editProfileAvatarModal.querySelector('.popup__form');
 const editProfileAvatarImage = document.querySelector('.profile__image');
-const profileAvatarinput = editProfileAvatarForm.querySelector(
-  '.popup__input_type_profile-url'
-);
+const profileAvatarinput = editProfileAvatarForm.querySelector('.popup__input_type_profile-url');
+
+const deleteCardModal = document.querySelector('.popup_type_card-remove')
+const deleteCardForm = deleteCardModal.querySelector('.popup__form')
+
 
 const modalCloseButtons = document.querySelectorAll('.popup__close');
 const nameInput = document.querySelector('.popup__input_type_name');
@@ -57,10 +58,24 @@ const imageModalCaption = imageModal.querySelector('.popup__caption');
 const inputName = addNewCardForm.querySelector('.popup__input_type_card-name');
 const inputUrl = addNewCardForm.querySelector('.popup__input_type_url');
 
+
+
+deleteCardForm.addEventListener('submit', () => {
+  const id = deleteCardForm.getAttribute('id')
+  fetchDeleteCardFromServer(id)
+  .then(() => {
+    document.getElementById(id).remove()
+  })
+  .catch((err) => console.log(err))
+  .finally(() => closeModal(deleteCardModal))
+})
+
+
+
+
 addNewCardButton.addEventListener('click', () => {
   const formElement = addNewCardModal.querySelector(
-    validationConfig.formSelector
-  );
+    validationConfig.formSelector);
   clearValidation(formElement, validationConfig);
   addNewCardForm.reset();
   openModal(addNewCardModal);
@@ -75,9 +90,15 @@ editProfileButton.addEventListener('click', () => {
   openModal(editProfileModal);
 });
 
+
 editProfileAvatarForm.addEventListener('submit', updateProfileAvatarSubmit);
 
 editProfileForm.addEventListener('submit', handleProfileFormSubmit);
+
+nameInputCurrent.addEventListener('click', () => {
+  openModal(deleteCardModal)
+});
+
 
 fillProfileInputs();
 
@@ -89,13 +110,18 @@ modalCloseButtons.forEach((button) => {
   });
 });
 
-[addNewCardModal, editProfileModal, imageModal, editProfileAvatarModal].forEach(
-  (modal) => {
-    modal.addEventListener('mousedown', (event) => {
-      closeModalByClickOnOverlay(event, modal);
-    });
-  }
-);
+
+allModals.forEach((modal) => {
+  modal.addEventListener('mousedown', (event) => {
+    closeModalByClickOnOverlay(event, modal)
+  } )
+})
+
+function openCardRemovalConfirmationModal (id) {
+  openModal(deleteCardModal);
+  deleteCardForm.setAttribute("id", id);
+}
+
 function handleProfileFormSubmit(evt) {
   evt.preventDefault();
   addPreloader(evt);
@@ -139,7 +165,7 @@ function addInitialCards(cards) {
   cards.forEach((card) => {
     const newCard = createCard(
       card,
-      handleDeleteCard,
+      openCardRemovalConfirmationModal,
       handleLikeCard,
       openImageModal,
       userId
@@ -160,13 +186,12 @@ addNewCardForm.addEventListener('submit', (evt) => {
       _id: userId,
     },
   };
-
   addPreloader(evt);
   fetchAddСardToServer(inputName.value, inputUrl.value)
     .then((cardData) => {
       const newCard = createCard(
         cardData,
-        handleDeleteCard,
+        openCardRemovalConfirmationModal,
         handleLikeCard,
         openImageModal,
         userId

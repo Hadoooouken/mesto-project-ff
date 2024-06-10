@@ -1,4 +1,4 @@
-import { fetchDeleteCardFromServer, removeLike, addLike } from './api.js';
+import { removeLike, addLike } from './api.js';
 
 export function createCard(card, onRemoveCard, addLikeCard, openImage, userId) {
   const cardTemplate = document.querySelector('#card-template').content;
@@ -18,7 +18,9 @@ export function createCard(card, onRemoveCard, addLikeCard, openImage, userId) {
   cardImage.alt = card.name;
 
   if (card.owner['_id'] === userId) {
-    deleteButton.addEventListener('click', onRemoveCard);
+    deleteButton.addEventListener('click', () => {
+      onRemoveCard(cardId)
+    });
   } else {
     deleteButton.remove();
   }
@@ -37,9 +39,7 @@ export function createCard(card, onRemoveCard, addLikeCard, openImage, userId) {
 
 export function handleLikeCard(event) {
   if (event.target.classList.contains('card__like-button')) {
-    const isActive = event.target.classList.contains(
-      'card__like-button_is-active'
-    );
+    const isActive = event.target.classList.contains('card__like-button_is-active');
     const cardItem = event.target.closest('.places__item');
     const id = cardItem.id;
     const cardLikeCount = cardItem.querySelector('.card__like-count');
@@ -53,14 +53,3 @@ export function handleLikeCard(event) {
   }
 }
 
-export function handleDeleteCard(event) {
-  console.log();
-  event.preventDefault();
-  const cardItem = event.target.closest('.places__item');
-  const id = cardItem.id;
-  fetchDeleteCardFromServer(id)
-    .then(() => {
-      cardItem.remove();
-    })
-    .catch((err) => console.log(err));
-}

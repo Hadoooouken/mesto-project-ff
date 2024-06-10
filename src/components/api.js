@@ -99,9 +99,11 @@ export const updateAvatar = (url) => {
   }).then(handleResponse);
 };
 
+
 const handleResponse = (res) => {
   if (res.ok) {
     return res.json();
   }
   return Promise.reject(`Что-то пошло не так: ${res.status}`);
 };
+
